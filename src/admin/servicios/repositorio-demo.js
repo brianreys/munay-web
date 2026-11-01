@@ -9,6 +9,7 @@ import {
   leerCatalogoDemo,
   restablecerCatalogoDemo,
 } from '../../datos/almacen-demo.js';
+import { normalizarColores } from '../../js/servicios/apariencia.js';
 import { blobADataUrl } from '../utilidades/imagenes.js';
 
 export const modo = 'demo';
@@ -115,6 +116,7 @@ export async function listarPortada() {
   // Las diapositivas de ejemplo no traen id ni orden: se completan acá.
   return datos.portada.map((d, indice) => ({
     id: d.id ?? `demo-${indice}`,
+    urlMovil: null,
     titulo: '',
     subtitulo: '',
     enlace: '',
@@ -127,13 +129,22 @@ export async function listarPortada() {
 
 export async function guardarPortada(diapositivas) {
   const portada = await Promise.all(
-    diapositivas.map(async ({ archivo, ...diapositiva }, indice) => ({
+    diapositivas.map(async ({ archivo, archivoMovil, ...diapositiva }, indice) => ({
       ...diapositiva,
       url: archivo ? await blobADataUrl(archivo) : diapositiva.url,
+      urlMovil: archivoMovil ? await blobADataUrl(archivoMovil) : diapositiva.urlMovil,
       orden: indice,
     })),
   );
   persistir({ ...datos, portada });
+}
+
+export async function obtenerColores() {
+  return normalizarColores(datos.ajustes);
+}
+
+export async function guardarColores(colores) {
+  persistir({ ...datos, ajustes: normalizarColores(colores) });
 }
 
 /** Solo demo: descarta los cambios y vuelve a los datos de ejemplo. */

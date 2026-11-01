@@ -11,6 +11,7 @@
  * volver a guardar completa lo que faltó, porque todo usa "upsert".
  */
 
+import { CLAVES_AJUSTES, coloresDesdeFilas, normalizarColores } from '../../js/servicios/apariencia.js';
 import { BUCKETS, supabase, urlPublica } from '../../js/servicios/supabase-cliente.js';
 import { extensionDe } from '../utilidades/imagenes.js';
 
@@ -249,13 +250,15 @@ export async function eliminarCategoria(id) {
 export async function listarPortada() {
   const { data, error } = await supabase
     .from('portada')
-    .select('id, ruta, titulo, subtitulo, enlace, texto_boton, activa, orden')
+    .select('id, ruta, ruta_movil, titulo, subtitulo, enlace, texto_boton, activa, orden')
     .order('orden');
   if (error) throw traducirError(error);
   return data.map((fila) => ({
     id: fila.id,
     ruta: fila.ruta,
     url: urlPublica(BUCKETS.portada, fila.ruta),
+    rutaMovil: fila.ruta_movil,
+    urlMovil: fila.ruta_movil ? urlPublica(BUCKETS.portada, fila.ruta_movil) : null,
     titulo: fila.titulo,
     subtitulo: fila.subtitulo,
     enlace: fila.enlace,
@@ -270,23 +273,27 @@ export async function listarPortada() {
  * guarda las filas y borra las diapositivas (y archivos) que ya no están.
  */
 export async function guardarPortada(diapositivas) {
-  const { data: previas, error } = await supabase.from('portada').select('id, ruta');
+  const { data: previas, error } = await supabase.from('portada').select('id, ruta, ruta_movil');
   if (error) throw traducirError(error);
+
+  /** Sube una foto con nombre nuevo (el archivo se cachea un año, así que nunca se pisa). */
+  async function subir(id, sufijo, archivo) {
+    const ruta = `${id}-${sufijo}${Date.now()}.${extensionDe(archivo)}`;
+    const { error: errorSubida } = await supabase.storage
+      .from(BUCKETS.portada)
+      .upload(ruta, archivo, { contentType: archivo.type, cacheControl: '31536000' });
+    if (errorSubida) throw new Error(`No se pudo subir una foto: ${errorSubida.message}`);
+    return ruta;
+  }
 
   const filas = [];
   for (const [indice, d] of diapositivas.entries()) {
-    let ruta = d.ruta;
-    if (d.archivo) {
-      // Nombre nuevo en cada cambio de foto: el archivo se cachea un año.
-      ruta = `${d.id}-${Date.now()}.${extensionDe(d.archivo)}`;
-      const { error: errorSubida } = await supabase.storage
-        .from(BUCKETS.portada)
-        .upload(ruta, d.archivo, { contentType: d.archivo.type, cacheControl: '31536000' });
-      if (errorSubida) throw new Error(`No se pudo subir una foto: ${errorSubida.message}`);
-    }
+    const ruta = d.archivo ? await subir(d.id, '', d.archivo) : d.ruta;
+    const rutaMovil = d.archivoMovil ? await subir(d.id, 'movil-', d.archivoMovil) : (d.rutaMovil ?? null);
     filas.push({
       id: d.id,
       ruta,
+      ruta_movil: rutaMovil,
       titulo: d.titulo,
       subtitulo: d.subtitulo,
       enlace: d.enlace,
@@ -303,9 +310,32 @@ export async function guardarPortada(diapositivas) {
   if (quitadas.length) await ejecutar(supabase.from('portada').delete().in('id', quitadas.map((p) => p.id)));
 
   // Archivos que ya nadie usa (diapositivas quitadas o fotos reemplazadas).
-  const rutasEnUso = new Set(filas.map((f) => f.ruta));
-  const sinUso = previas.map((p) => p.ruta).filter((ruta) => !rutasEnUso.has(ruta));
+  const rutasEnUso = new Set(filas.flatMap((f) => [f.ruta, f.ruta_movil]));
+  const sinUso = previas.flatMap((p) => [p.ruta, p.ruta_movil]).filter((ruta) => ruta && !rutasEnUso.has(ruta));
   if (sinUso.length) await supabase.storage.from(BUCKETS.portada).remove(sinUso);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Colores (tabla ajustes)                                                    */
+/* -------------------------------------------------------------------------- */
+
+export async function obtenerColores() {
+  const { data, error } = await supabase.from('ajustes').select('clave, valor');
+  if (error) throw traducirError(error);
+  return coloresDesdeFilas(data);
+}
+
+export async function guardarColores(colores) {
+  const normalizados = normalizarColores(colores);
+  await ejecutar(
+    supabase.from('ajustes').upsert(
+      Object.entries(CLAVES_AJUSTES).map(([campo, clave]) => ({
+        clave,
+        valor: normalizados[campo],
+        actualizado_en: new Date().toISOString(),
+      })),
+    ),
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -327,6 +357,12 @@ async function borrarQuitadas(tabla, productoId, idsVigentes) {
 
 /** Convierte errores técnicos de la base en mensajes entendibles. */
 function traducirError(error) {
+  // Columna o tabla inexistente: la base no tiene la última migración.
+  if (['42703', '42P01', 'PGRST204', 'PGRST205'].includes(error.code)) {
+    return new Error(
+      'Falta actualizar la base de datos: ejecutá en Supabase el archivo supabase/migraciones/01-portada-movil-y-colores.sql (ver docs/SUPABASE.md).',
+    );
+  }
   if (error.code === '23505' && error.message.includes('categorias')) {
     return new Error('Ya existe una categoría con ese nombre en ese nivel.');
   }

@@ -20,7 +20,10 @@
  *   guardarCategorias(categorias)         → crea o actualiza (nombre, orden, menú)
  *   eliminarCategoria(id)                 → también borra sus subcategorías
  *   listarPortada()                       → Diapositiva[] (incluye inactivas)
- *   guardarPortada(diapositivas)          → reemplaza todas (sube fotos nuevas)
+ *   guardarPortada(diapositivas)          → reemplaza todas (sube fotos nuevas:
+ *                                           `archivo` escritorio, `archivoMovil` celular)
+ *   obtenerColores()                      → { colorFondo, colorEncabezado }
+ *   guardarColores(colores)
  *
  * Forma de un Producto: igual a la de `src/datos/catalogo-demo.js`. Las fotos
  * nuevas traen además `archivo` (Blob optimizado) y todavía no tienen `ruta`.

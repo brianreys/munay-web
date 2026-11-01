@@ -231,11 +231,27 @@
 }
 
 /* ----- Carrusel de portada ----- */
+/* Proporciones iguales a FORMATO_PORTADA (js/componentes/carrusel.js), que
+   es el formato en que el panel recorta las fotos: 16:7 en escritorio y 4:5
+   en celular. Así la foto se ve tal cual se recortó. */
 .carrusel {
   position: relative;
-  height: clamp(420px, 72vh, 680px);
+  aspect-ratio: 16 / 7;
+  min-height: 360px;
+  max-height: 85vh;
   overflow: hidden;
   background: var(--color-chocolate);
+}
+
+@media (max-width: 680px) {
+  .carrusel {
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+  }
+}
+
+.carrusel picture {
+  display: contents;
 }
 
 .carrusel__pista,
@@ -257,11 +273,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 55%;
 }
 
 /* Degradado chocolate para que el texto se lea sobre cualquier foto */
-.carrusel__diapositiva::after {
+.carrusel__diapositiva--con-texto::after {
   content: '';
   position: absolute;
   inset: 0;

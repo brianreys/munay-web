@@ -49,9 +49,9 @@ munay-web/
 │   ├── config.js               Textos y datos de contacto editables
 │   ├── admin/                  Panel de administración
 │   │   ├── main.js             Punto de entrada: sesión + estructura + router
-│   │   ├── router.js           #/ lista · #/nuevo · #/editar/<id> · #/categorias · #/portada
-│   │   ├── vistas/             login.js, lista.js, editor.js, categorias.js, portada.js
-│   │   ├── componentes/        avisos.js (mensajes emergentes)
+│   │   ├── router.js           #/ lista · #/nuevo · #/editar/<id> · #/categorias · #/portada · #/colores
+│   │   ├── vistas/             login.js, lista.js, editor.js, categorias.js, portada.js, colores.js
+│   │   ├── componentes/        avisos.js (mensajes), recortador.js (recorte de fotos)
 │   │   ├── servicios/          repositorio (demo o Supabase) para escribir datos
 │   │   ├── utilidades/         optimización de imágenes, slugs, reglas de categorías
 │   │   └── estilos/admin.css
@@ -71,7 +71,8 @@ munay-web/
 │       └── utilidades/         Formato de precios, enlaces, escape de HTML
 ├── supabase/
 │   ├── esquema.sql             Tablas, seguridad (RLS) y buckets de fotos
-│   └── semilla.sql             Categorías iniciales
+│   ├── semilla.sql             Categorías iniciales
+│   └── migraciones/            Cambios para bases ya creadas (ver docs/SUPABASE.md)
 └── docs/                       Documentación (ver abajo)
 ```
 

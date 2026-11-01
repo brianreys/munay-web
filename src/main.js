@@ -10,10 +10,14 @@ import './estilos/componentes.css';
 import { renderAnuncio, renderEncabezado } from './js/componentes/encabezado.js';
 import { renderPie } from './js/componentes/pie.js';
 import { iniciarRouter } from './js/router.js';
+import { aplicarColores, aplicarColoresRecordados, recordarColores } from './js/servicios/apariencia.js';
 import { obtenerCatalogo } from './js/servicios/catalogo.js';
 
 async function iniciar() {
   const contenedor = document.getElementById('contenido');
+
+  // Colores de la última visita mientras llegan los datos (evita un parpadeo).
+  aplicarColoresRecordados();
 
   // El pie y el anuncio no dependen de los datos: se muestran enseguida.
   renderAnuncio(document.getElementById('anuncio'));
@@ -21,6 +25,8 @@ async function iniciar() {
 
   try {
     const catalogo = await obtenerCatalogo();
+    aplicarColores(catalogo.ajustes);
+    recordarColores(catalogo.ajustes);
     renderEncabezado(document.getElementById('encabezado'), catalogo);
     iniciarRouter({ contenedor, catalogo });
   } catch (error) {

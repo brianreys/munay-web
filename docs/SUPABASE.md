@@ -51,6 +51,16 @@ Entrá a `/admin.html` con una de las cuentas creadas y seguí la [guía del pan
 
 > Los productos de la demo no se copian a Supabase: el catálogo real se carga desde cero en el panel. El carrusel de inicio se edita desde la pestaña **Portada** del panel. Mientras no haya diapositivas activas, la web muestra las 3 de `src/datos/portada-predeterminada.js`.
 
+## 6. Migraciones (actualizaciones de la base)
+
+Cuando la web suma funciones que necesitan cambios en la base, el cambio se agrega como un archivo en [`supabase/migraciones/`](../supabase/migraciones/). Los proyectos creados **antes** de ese cambio tienen que ejecutarlo una vez: **SQL Editor → New query → pegar el archivo → Run**. Los proyectos nuevos no lo necesitan, porque `esquema.sql` ya lo incluye.
+
+| Archivo | Qué agrega |
+| --- | --- |
+| `01-portada-movil-y-colores.sql` | Foto vertical para celular en la portada y la tabla `ajustes` (colores) |
+
+Si falta una migración, el panel lo avisa al guardar, y la web pública sigue funcionando con la portada y los colores predeterminados.
+
 ## Límites del plan gratuito (para tener en cuenta)
 
 - 500 MB de base de datos y 1 GB de archivos: alcanza para miles de fotos optimizadas.

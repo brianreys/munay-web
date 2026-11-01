@@ -127,13 +127,25 @@ create index foto_categorias_categoria_idx on public.foto_categorias (categoria_
 -- -----------------------------------------------------------------------------
 create table public.portada (
   id          uuid primary key default gen_random_uuid(),
-  ruta        text not null,                -- archivo en el bucket 'portada'
+  ruta        text not null,                -- archivo en el bucket 'portada' (horizontal, escritorio)
+  ruta_movil  text,                         -- versión vertical para celular (opcional)
   titulo      text not null default '',
   subtitulo   text not null default '',
   enlace      text not null default '#/productos',
   texto_boton text not null default 'Ver colección',
   activa      boolean not null default true,
   orden       integer not null default 0
+);
+
+
+-- -----------------------------------------------------------------------------
+-- 7b. AJUSTES del sitio editables desde el panel (ej: colores)
+-- Claves usadas hoy: 'color_fondo', 'color_encabezado' (código #rrggbb).
+-- -----------------------------------------------------------------------------
+create table public.ajustes (
+  clave          text primary key,
+  valor          text not null,
+  actualizado_en timestamptz not null default now()
 );
 
 
@@ -167,6 +179,7 @@ alter table public.variantes       enable row level security;
 alter table public.fotos           enable row level security;
 alter table public.foto_categorias enable row level security;
 alter table public.portada         enable row level security;
+alter table public.ajustes         enable row level security;
 
 -- Administradores: cada admin puede ver la lista (no se edita desde la web).
 create policy "admins leen administradores" on public.administradores
@@ -219,16 +232,21 @@ create policy "lectura publica" on public.portada
 create policy "admins gestionan" on public.portada
   for all to authenticated using (public.es_admin()) with check (public.es_admin());
 
+create policy "lectura publica" on public.ajustes
+  for select using (true);
+create policy "admins gestionan" on public.ajustes
+  for all to authenticated using (public.es_admin()) with check (public.es_admin());
+
 -- Permisos de acceso por la API. Los proyectos nuevos de Supabase pueden no
 -- otorgarlos automáticamente; RLS (arriba) sigue decidiendo QUÉ filas se ven.
 grant select on
   public.categorias, public.productos, public.variantes,
-  public.fotos, public.foto_categorias, public.portada
+  public.fotos, public.foto_categorias, public.portada, public.ajustes
   to anon, authenticated;
 grant select on public.administradores to authenticated;
 grant insert, update, delete on
   public.categorias, public.productos, public.variantes,
-  public.fotos, public.foto_categorias, public.portada
+  public.fotos, public.foto_categorias, public.portada, public.ajustes
   to authenticated;
 
 

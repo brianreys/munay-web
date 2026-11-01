@@ -5,12 +5,24 @@
  *   movimiento o esté interactuando (mouse encima / foco dentro).
  * - Se puede manejar con flechas, puntos, teclado y deslizando en el celular.
  * - Las diapositivas ocultas llevan `inert` para que no reciban foco.
+ * - Cada diapositiva puede tener una foto horizontal (escritorio) y otra
+ *   vertical (celular). Título, subtítulo y botón son opcionales.
  */
 
 import { esc, prefiereMenosMovimiento } from '../utilidades/html.js';
 import { ICONOS } from './iconos.js';
 
 const DISTANCIA_MINIMA_DESLIZAR = 40; // px
+
+/**
+ * Formato de las fotos de portada. El recortador del panel usa estos mismos
+ * valores, y `.carrusel` en componentes.css tiene las mismas proporciones.
+ */
+export const FORMATO_PORTADA = {
+  escritorio: { ancho: 1920, alto: 840 }, // 16:7, horizontal
+  movil: { ancho: 1080, alto: 1350 }, // 4:5, vertical
+  anchoMaximoMovil: 680, // px: hasta este ancho de pantalla se usa la foto vertical
+};
 
 /**
  * @param {HTMLElement} raiz  Contenedor vacío donde se dibuja el carrusel.
@@ -103,17 +115,41 @@ export function crearCarrusel(raiz, diapositivas, { intervalo = 6000 } = {}) {
 function diapositivaHtml(diapositiva, indice, total) {
   // La primera imagen se carga con prioridad: es lo primero que se ve.
   const carga = indice === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
+  const texto = textoPortadaHtml(diapositiva);
   return `
-    <div class="carrusel__diapositiva" role="group" aria-roledescription="diapositiva"
-         aria-label="${indice + 1} de ${total}">
-      <img class="carrusel__imagen" src="${esc(diapositiva.url)}" alt="" ${carga} decoding="async" />
-      <div class="carrusel__texto">
-        ${diapositiva.titulo ? `<h2 class="carrusel__titulo">${esc(diapositiva.titulo)}</h2>` : ''}
-        ${diapositiva.subtitulo ? `<p class="carrusel__subtitulo">${esc(diapositiva.subtitulo)}</p>` : ''}
-        ${diapositiva.enlace
-          ? `<a class="boton boton--claro" href="${esc(diapositiva.enlace)}">${esc(diapositiva.textoBoton || 'Ver colección')}</a>`
-          : ''}
-      </div>
+    <div class="carrusel__diapositiva${texto ? ' carrusel__diapositiva--con-texto' : ''}" role="group"
+         aria-roledescription="diapositiva" aria-label="${indice + 1} de ${total}">
+      ${imagenPortadaHtml(diapositiva, carga)}
+      ${texto}
+    </div>`;
+}
+
+/**
+ * Foto de una diapositiva: en celular usa la versión vertical si existe.
+ * Exportada para la vista previa del panel.
+ */
+export function imagenPortadaHtml(diapositiva, atributos = '') {
+  const movil = diapositiva.urlMovil
+    ? `<source media="(max-width: ${FORMATO_PORTADA.anchoMaximoMovil}px)" srcset="${esc(diapositiva.urlMovil)}" />`
+    : '';
+  return `
+    <picture>
+      ${movil}
+      <img class="carrusel__imagen" src="${esc(diapositiva.url)}" alt="" ${atributos} decoding="async" />
+    </picture>`;
+}
+
+/**
+ * Título, subtítulo y botón (todos opcionales). Sin ninguno, no se dibuja nada.
+ * Exportada para la vista previa del panel.
+ */
+export function textoPortadaHtml({ titulo, subtitulo, enlace, textoBoton }) {
+  if (!titulo && !subtitulo && !enlace) return '';
+  return `
+    <div class="carrusel__texto">
+      ${titulo ? `<h2 class="carrusel__titulo">${esc(titulo)}</h2>` : ''}
+      ${subtitulo ? `<p class="carrusel__subtitulo">${esc(subtitulo)}</p>` : ''}
+      ${enlace ? `<a class="boton boton--claro" href="${esc(enlace)}">${esc(textoBoton || 'Ver colección')}</a>` : ''}
     </div>`;
 }
 

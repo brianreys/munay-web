@@ -6,6 +6,7 @@
  * Las políticas RLS ya filtran lo que no es público (productos ocultos, etc.).
  */
 
+import { coloresDesdeFilas } from '../apariencia.js';
 import { supabase, BUCKETS, urlPublica } from '../supabase-cliente.js';
 
 const CONSULTA_PRODUCTOS = `
@@ -16,24 +17,32 @@ const CONSULTA_PRODUCTOS = `
 
 /** @returns {Promise<import('../catalogo.js').CatalogoCrudo>} */
 export async function cargarCatalogo() {
-  const [categorias, productos, portada] = await Promise.all([
+  const [categorias, productos, portada, ajustes] = await Promise.all([
     supabase.from('categorias').select('id, slug, nombre, padre_id, en_menu, orden'),
     supabase.from('productos').select(CONSULTA_PRODUCTOS).eq('estado', 'publicado'),
     supabase
       .from('portada')
-      .select('ruta, titulo, subtitulo, enlace, texto_boton, orden')
+      .select('ruta, ruta_movil, titulo, subtitulo, enlace, texto_boton, orden')
       .eq('activa', true)
       .order('orden'),
+    supabase.from('ajustes').select('clave, valor'),
   ]);
 
-  for (const respuesta of [categorias, productos, portada]) {
+  // Sin categorías o productos no hay catálogo: eso sí es un error.
+  for (const respuesta of [categorias, productos]) {
     if (respuesta.error) throw respuesta.error;
+  }
+  // La portada y los colores son secundarios: si fallan (ej: falta correr una
+  // migración), la web sigue con las diapositivas y colores predeterminados.
+  for (const [nombre, respuesta] of [['portada', portada], ['ajustes', ajustes]]) {
+    if (respuesta.error) console.warn(`No se pudo leer "${nombre}":`, respuesta.error.message);
   }
 
   return {
     categorias: categorias.data.map(mapearCategoria),
     productos: productos.data.map(mapearProducto),
-    portada: portada.data.map(mapearDiapositiva),
+    portada: (portada.data ?? []).map(mapearDiapositiva),
+    ajustes: coloresDesdeFilas(ajustes.data ?? []),
   };
 }
 
@@ -81,6 +90,7 @@ function mapearDiapositiva(fila) {
   return {
     orden: fila.orden,
     url: urlPublica(BUCKETS.portada, fila.ruta),
+    urlMovil: fila.ruta_movil ? urlPublica(BUCKETS.portada, fila.ruta_movil) : null,
     titulo: fila.titulo,
     subtitulo: fila.subtitulo,
     enlace: fila.enlace,

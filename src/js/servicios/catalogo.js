@@ -13,12 +13,14 @@
  */
 
 import { PORTADA_PREDETERMINADA } from '../../datos/portada-predeterminada.js';
+import { normalizarColores } from './apariencia.js';
 
 /**
  * @typedef {Object} CatalogoCrudo  Forma común que devuelven los proveedores.
  * @property {Array} categorias
  * @property {Array} productos
  * @property {Array} portada
+ * @property {{ colorFondo?: string, colorEncabezado?: string }} [ajustes]
  */
 
 /** @type {Promise<Object> | null} */
@@ -50,7 +52,7 @@ export function obtenerCatalogo() {
 
 const porOrden = (a, b) => a.orden - b.orden;
 
-function prepararCatalogo({ categorias, productos, portada }) {
+function prepararCatalogo({ categorias, productos, portada, ajustes }) {
   const categoriasOrdenadas = [...categorias].sort(porOrden);
   const categoriasPorId = new Map(categoriasOrdenadas.map((c) => [c.id, c]));
 
@@ -69,6 +71,7 @@ function prepararCatalogo({ categorias, productos, portada }) {
       .filter((producto) => producto.variantes.length > 0)
       .sort(compararProductos),
     portada: diapositivasActivas(portada),
+    ajustes: normalizarColores(ajustes),
   };
 }
 

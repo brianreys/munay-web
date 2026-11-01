@@ -2,18 +2,42 @@
  * Sección Portada: diapositivas del carrusel de la página de inicio.
  * Ruta: #/portada
  *
- * Igual que el editor de productos, trabaja sobre un "borrador" y nada se
- * guarda hasta tocar "Guardar". Cada diapositiva tiene foto, título,
- * subtítulo, a dónde lleva el botón, texto del botón y si está activa.
+ * Cada diapositiva tiene dos fotos recortadas a medida:
+ *   - Escritorio: horizontal (16:7).
+ *   - Celular: vertical (4:5). Puede salir de la misma foto o de otra.
+ * Título, subtítulo y botón son opcionales, y una vista previa muestra cómo
+ * queda mientras se escribe.
  *
- * Sin diapositivas activas, la web muestra las predeterminadas
- * (src/datos/portada-predeterminada.js).
+ * Igual que el editor de productos, trabaja sobre un "borrador" y nada se
+ * guarda hasta tocar "Guardar". Sin diapositivas activas, la web muestra las
+ * predeterminadas (src/datos/portada-predeterminada.js).
  */
 
 import { mostrarAviso } from '../componentes/avisos.js';
+import { recortarImagen } from '../componentes/recortador.js';
 import { hijasDe } from '../utilidades/categorias.js';
-import { optimizarImagen } from '../utilidades/imagenes.js';
+import { FORMATO_PORTADA, imagenPortadaHtml, textoPortadaHtml } from '../../js/componentes/carrusel.js';
 import { esc } from '../../js/utilidades/html.js';
+
+/** Textos de cada paso del recorte. */
+const RECORTE = {
+  escritorio: {
+    ...FORMATO_PORTADA.escritorio,
+    titulo: 'Versión escritorio (horizontal)',
+    ayuda: 'Así se ve en computadoras y tablets.',
+  },
+  movil: {
+    ...FORMATO_PORTADA.movil,
+    titulo: 'Versión celular (vertical)',
+    ayuda: 'Así se ve en celulares. Podés recortar la misma foto o elegir otra.',
+  },
+};
+
+/** Tamaño "real" con el que se dibuja cada vista previa antes de achicarla. */
+const LIENZO_PREVIA = {
+  escritorio: { ancho: 1280, alto: 560 },
+  movil: { ancho: 375, alto: 469 },
+};
 
 /** @param {{ contenedor: HTMLElement, repositorio: Object }} contexto */
 export async function vistaPortada({ contenedor, repositorio }) {
@@ -41,18 +65,18 @@ export async function vistaPortada({ contenedor, repositorio }) {
       </div>
       <p class="panel__ayuda portada-ayuda">
         Las diapositivas del carrusel de la página de inicio, en el orden en que se muestran.
-        Conviene usar fotos horizontales con el producto en el centro.
+        Al agregar una foto vas a recortarla dos veces: horizontal para computadoras y
+        vertical para celulares.
       </p>
 
       <div class="editor__errores" role="alert" tabindex="-1" hidden data-errores></div>
 
-      <ul class="fotos-editor" data-diapositivas></ul>
+      <ul class="diapositivas-editor" data-diapositivas></ul>
 
       <label class="boton boton--contorno boton--chico subir-fotos">
-        <input type="file" accept="image/*" multiple class="visualmente-oculto" data-subir />
+        <input type="file" accept="image/*" class="visualmente-oculto" data-subir />
         + Agregar diapositiva
       </label>
-      <p class="panel__ayuda" data-procesando hidden role="status">Procesando fotos…</p>
 
       <div class="editor__barra">
         <button type="button" class="boton boton--contorno" data-accion="descartar">Descartar</button>
@@ -63,17 +87,34 @@ export async function vistaPortada({ contenedor, repositorio }) {
   const formulario = contenedor.querySelector('form');
   const lista = formulario.querySelector('[data-diapositivas]');
   const entradaFotos = formulario.querySelector('[data-subir]');
-  const procesando = formulario.querySelector('[data-procesando]');
   const cajaErrores = formulario.querySelector('[data-errores]');
   const botonGuardar = formulario.querySelector('[type="submit"]');
 
+  // Las vistas previas se dibujan en tamaño real y se achican al ancho disponible.
+  const observadorPrevias = new ResizeObserver((entradas) => {
+    for (const { target } of entradas) {
+      const { ancho } = LIENZO_PREVIA[target.dataset.previa];
+      target.style.setProperty('--escala', target.clientWidth / ancho);
+    }
+  });
+
   function pintar() {
+    observadorPrevias.disconnect();
     lista.innerHTML = borrador.length
       ? borrador.map((d, i) => diapositivaHtml(d, i, borrador.length, destinos)).join('')
       : `<li class="fotos-editor__vacio">
            Todavía no hay diapositivas: la web muestra las de ejemplo.
            Agregá la primera con el botón de abajo.
          </li>`;
+    lista.querySelectorAll('[data-previa]').forEach((marco) => observadorPrevias.observe(marco));
+  }
+
+  /** Actualiza solo las vistas previas de una diapositiva (sin tocar los campos). */
+  function pintarPrevias(indice) {
+    const tarjeta = lista.querySelector(`[data-indice="${indice}"]`);
+    tarjeta.querySelectorAll('[data-previa]').forEach((marco) => {
+      marco.querySelector('.previa__lienzo').innerHTML = previaContenidoHtml(borrador[indice], marco.dataset.previa);
+    });
   }
 
   function marcarModificado() {
@@ -82,59 +123,50 @@ export async function vistaPortada({ contenedor, repositorio }) {
 
   /* ----- Fotos ----- */
 
-  /** Optimiza una imagen y devuelve { archivo, url } para la vista previa. */
-  async function prepararFoto(archivo) {
-    const imagen = await optimizarImagen(archivo);
-    const url = URL.createObjectURL(imagen);
-    urlsTemporales.push(url);
-    return { archivo: imagen, url };
-  }
-
-  async function conProcesando(tarea) {
-    procesando.hidden = false;
-    entradaFotos.disabled = true;
+  /** Abre el recortador y devuelve { archivo, url } listo para el borrador, o null. */
+  async function recortar(archivo, formato, permitirOtraFoto = false) {
     try {
-      await tarea();
-    } finally {
-      entradaFotos.disabled = false;
-      procesando.hidden = true;
+      const recorte = await recortarImagen(archivo, { ...RECORTE[formato], permitirOtraFoto });
+      if (!recorte) return null;
+      const url = URL.createObjectURL(recorte);
+      urlsTemporales.push(url);
+      return { archivo: recorte, url };
+    } catch {
+      mostrarAviso(`No se pudo abrir "${archivo.name}". ¿Es una imagen?`, 'error');
+      return null;
     }
   }
 
-  async function agregarDiapositivas(archivos) {
-    await conProcesando(async () => {
-      for (const archivo of archivos) {
-        try {
-          borrador.push({
-            id: crypto.randomUUID(),
-            titulo: '',
-            subtitulo: '',
-            enlace: '#/productos',
-            textoBoton: 'Ver colección',
-            activa: true,
-            ...(await prepararFoto(archivo)),
-          });
-        } catch {
-          mostrarAviso(`No se pudo procesar "${archivo.name}". ¿Es una imagen?`, 'error');
-        }
-      }
+  async function agregarDiapositiva(archivo) {
+    const escritorio = await recortar(archivo, 'escritorio');
+    if (!escritorio) return;
+    const movil = await recortar(archivo, 'movil', true);
+    if (!movil) mostrarAviso('Sin versión para celular: en celulares se va a ver la horizontal, recortada al centro.');
+
+    borrador.push({
+      id: crypto.randomUUID(),
+      titulo: '',
+      subtitulo: '',
+      enlace: '',
+      textoBoton: '',
+      activa: true,
+      url: escritorio.url,
+      archivo: escritorio.archivo,
+      urlMovil: movil?.url ?? null,
+      archivoMovil: movil?.archivo ?? null,
     });
-    entradaFotos.value = '';
     marcarModificado();
     pintar();
+    lista.querySelector(`[data-indice="${borrador.length - 1}"] [data-d="titulo"]`)?.focus();
   }
 
-  async function cambiarFoto(indice, entrada) {
-    const [archivo] = entrada.files;
-    if (!archivo) return;
-    await conProcesando(async () => {
-      try {
-        Object.assign(borrador[indice], await prepararFoto(archivo));
-        marcarModificado();
-      } catch {
-        mostrarAviso(`No se pudo procesar "${archivo.name}". ¿Es una imagen?`, 'error');
-      }
-    });
+  async function cambiarFoto(indice, formato, archivo) {
+    const recorte = await recortar(archivo, formato);
+    if (!recorte) return;
+    const diapositiva = borrador[indice];
+    if (formato === 'escritorio') Object.assign(diapositiva, recorte);
+    else Object.assign(diapositiva, { urlMovil: recorte.url, archivoMovil: recorte.archivo });
+    marcarModificado();
     pintar();
   }
 
@@ -151,6 +183,10 @@ export async function vistaPortada({ contenedor, repositorio }) {
   const acciones = {
     subir: (indice) => mover(indice, indice - 1),
     bajar: (indice) => mover(indice, indice + 1),
+    'quitar-movil'(indice) {
+      Object.assign(borrador[indice], { urlMovil: null, archivoMovil: null, rutaMovil: null });
+      pintar();
+    },
     quitar(indice) {
       if (!confirm('¿Quitar esta diapositiva del carrusel?')) return false;
       borrador.splice(indice, 1);
@@ -211,25 +247,37 @@ export async function vistaPortada({ contenedor, repositorio }) {
   const control = new AbortController();
   const { signal } = control;
 
-  // `input` para textos (al tipear) y `change` para casillas, selectores y fotos.
+  const indiceDe = (elemento) => Number(elemento.closest('[data-indice]')?.dataset.indice);
+
+  // Campos de texto, destino del botón y "Activa": actualizan el borrador y la vista previa.
   const actualizar = (e) => {
     const campo = e.target.dataset.d;
-    const diapositiva = borrador[Number(e.target.closest('[data-indice]')?.dataset.indice)];
+    const indice = indiceDe(e.target);
+    const diapositiva = borrador[indice];
     if (!campo || !diapositiva) return;
     diapositiva[campo] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     marcarModificado();
+    pintarPrevias(indice);
   };
   formulario.addEventListener('input', actualizar, { signal });
 
   formulario.addEventListener('change', (e) => {
-    if (e.target === entradaFotos) return agregarDiapositivas([...entradaFotos.files]);
-    if ('cambiarFoto' in e.target.dataset) {
-      return cambiarFoto(Number(e.target.closest('[data-indice]').dataset.indice), e.target);
+    if (e.target === entradaFotos) {
+      const [archivo] = entradaFotos.files;
+      entradaFotos.value = '';
+      if (archivo) agregarDiapositiva(archivo);
+      return;
+    }
+    const formato = e.target.dataset.cambiarFoto;
+    if (formato) {
+      const [archivo] = e.target.files;
+      if (archivo) cambiarFoto(indiceDe(e.target), formato, archivo);
+      return;
     }
     actualizar(e);
-    // El interruptor "Activa" cambia la etiqueta de la foto.
+    // "Activa" cambia la etiqueta de la tarjeta.
     if (e.target.dataset.d === 'activa') {
-      const indice = Number(e.target.closest('[data-indice]').dataset.indice);
+      const indice = indiceDe(e.target);
       pintar();
       lista.querySelector(`[data-indice="${indice}"] [data-d="activa"]`)?.focus();
     }
@@ -238,8 +286,7 @@ export async function vistaPortada({ contenedor, repositorio }) {
   formulario.addEventListener('click', (e) => {
     const boton = e.target.closest('[data-accion]');
     if (!boton) return;
-    const indice = Number(boton.closest('[data-indice]')?.dataset.indice);
-    if (acciones[boton.dataset.accion](indice) !== false) marcarModificado();
+    if (acciones[boton.dataset.accion](indiceDe(boton)) !== false) marcarModificado();
   }, { signal });
 
   formulario.addEventListener('submit', (e) => {
@@ -257,6 +304,7 @@ export async function vistaPortada({ contenedor, repositorio }) {
     puedeSalir: () => !modificado || confirm('Tenés cambios sin guardar en la portada. ¿Salir igual?'),
     limpiar: () => {
       control.abort();
+      observadorPrevias.disconnect();
       urlsTemporales.forEach((url) => URL.revokeObjectURL(url));
     },
   };
@@ -294,32 +342,38 @@ function diapositivaHtml(d, indice, total, destinos) {
     .join('');
 
   return `
-    <li class="foto-editor foto-editor--portada${d.activa ? '' : ' foto-editor--inactiva'}" data-indice="${indice}">
-      <div class="foto-editor__imagen">
-        <img src="${esc(d.url)}" alt="" />
-        <span class="foto-editor__numero">${d.activa ? `Diapositiva ${indice + 1}` : 'Inactiva'}</span>
+    <li class="diapositiva-editor${d.activa ? '' : ' diapositiva-editor--inactiva'}" data-indice="${indice}">
+      <div class="diapositiva-editor__encabezado">
+        <strong>${d.activa ? `Diapositiva ${indice + 1}` : `Diapositiva ${indice + 1} · inactiva`}</strong>
       </div>
 
-      <div class="foto-editor__campos">
+      <div class="previas">
+        ${previaHtml(d, 'escritorio')}
+        ${previaHtml(d, 'movil')}
+      </div>
+
+      <div class="diapositiva-editor__campos">
         <label class="campo">
-          <span class="campo__etiqueta">Título</span>
+          <span class="campo__etiqueta">Título <small>(opcional)</small></span>
           <input class="campo__control" data-d="titulo" value="${esc(d.titulo)}" maxlength="60"
                  placeholder="Ej: Piezas hechas a mano" />
         </label>
         <label class="campo">
-          <span class="campo__etiqueta">Subtítulo</span>
+          <span class="campo__etiqueta">Subtítulo <small>(opcional)</small></span>
           <input class="campo__control" data-d="subtitulo" value="${esc(d.subtitulo)}" maxlength="120"
                  placeholder="Ej: Piedras naturales elegidas una por una." />
         </label>
-        <label class="campo">
-          <span class="campo__etiqueta">El botón lleva a</span>
-          <select class="campo__control" data-d="enlace">${opciones}</select>
-        </label>
-        <label class="campo">
-          <span class="campo__etiqueta">Texto del botón</span>
-          <input class="campo__control" data-d="textoBoton" value="${esc(d.textoBoton)}" maxlength="30"
-                 placeholder="Ver colección" />
-        </label>
+        <div class="diapositiva-editor__boton">
+          <label class="campo">
+            <span class="campo__etiqueta">Botón <small>(opcional)</small>: lleva a</span>
+            <select class="campo__control" data-d="enlace">${opciones}</select>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Texto del botón</span>
+            <input class="campo__control" data-d="textoBoton" value="${esc(d.textoBoton)}" maxlength="30"
+                   placeholder="Ver colección" />
+          </label>
+        </div>
         <label class="interruptor">
           <input type="checkbox" data-d="activa" ${d.activa ? 'checked' : ''} />
           <span class="interruptor__texto">Activa (se muestra en la web)</span>
@@ -331,11 +385,42 @@ function diapositivaHtml(d, indice, total, destinos) {
                 aria-label="Mover antes" title="Mover antes">←</button>
         <button type="button" class="boton-icono" data-accion="bajar" ${indice === total - 1 ? 'disabled' : ''}
                 aria-label="Mover después" title="Mover después">→</button>
-        <label class="boton-texto subir-fotos">
-          <input type="file" accept="image/*" class="visualmente-oculto" data-cambiar-foto />
-          Cambiar foto
-        </label>
-        <button type="button" class="boton-texto boton-texto--peligro" data-accion="quitar">Quitar</button>
+        <button type="button" class="boton-texto boton-texto--peligro" data-accion="quitar">Quitar diapositiva</button>
       </div>
     </li>`;
+}
+
+/** Vista previa de un formato, con su botón para cambiar la foto. */
+function previaHtml(d, formato) {
+  const esMovil = formato === 'movil';
+  const usaEscritorio = esMovil && !d.urlMovil;
+  return `
+    <figure class="previa previa--${formato}">
+      <div class="previa__marco" data-previa="${formato}">
+        <div class="previa__lienzo" style="width: ${LIENZO_PREVIA[formato].ancho}px; height: ${LIENZO_PREVIA[formato].alto}px">
+          ${previaContenidoHtml(d, formato)}
+        </div>
+      </div>
+      <figcaption class="previa__pie">
+        <span>${esMovil ? 'Celular' : 'Escritorio'}${usaEscritorio ? ' · usa la horizontal' : ''}</span>
+        <label class="boton-texto subir-fotos">
+          <input type="file" accept="image/*" class="visualmente-oculto" data-cambiar-foto="${formato}" />
+          ${usaEscritorio ? 'Agregar foto' : 'Cambiar foto'}
+        </label>
+        ${esMovil && d.urlMovil
+          ? '<button type="button" class="boton-texto" data-accion="quitar-movil">Usar la horizontal</button>'
+          : ''}
+      </figcaption>
+    </figure>`;
+}
+
+/** Interior de la vista previa: misma estructura que una diapositiva del carrusel. */
+function previaContenidoHtml(d, formato) {
+  const foto = formato === 'movil' ? { url: d.urlMovil || d.url } : { url: d.url };
+  const texto = textoPortadaHtml(d);
+  return `
+    <div class="carrusel__diapositiva es-activa${texto ? ' carrusel__diapositiva--con-texto' : ''}">
+      ${imagenPortadaHtml(foto)}
+      ${texto}
+    </div>`;
 }

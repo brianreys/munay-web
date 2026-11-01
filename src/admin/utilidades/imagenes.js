@@ -27,8 +27,17 @@ export async function optimizarImagen(archivo) {
   lienzo.getContext('2d').drawImage(imagen, 0, 0, ancho, alto);
   imagen.close();
 
+  return comprimirLienzo(lienzo);
+}
+
+/**
+ * Comprime lo dibujado en un canvas como WebP (o JPEG si el navegador no
+ * sabe generar WebP: en ese caso devuelve PNG, que pesa mucho).
+ * @param {HTMLCanvasElement} lienzo
+ * @returns {Promise<Blob>}
+ */
+export async function comprimirLienzo(lienzo) {
   const webp = await lienzoABlob(lienzo, 'image/webp');
-  // Si el navegador no soporta WebP devuelve PNG (pesado): mejor JPEG.
   return webp.type === 'image/webp' ? webp : lienzoABlob(lienzo, 'image/jpeg');
 }
 

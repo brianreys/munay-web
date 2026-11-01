@@ -70,16 +70,29 @@ Pestaña **Categorías**, arriba del panel. Son las secciones del menú de la we
 
 Pestaña **Portada**. Son las fotos grandes que pasan solas al entrar a la web. Como en los productos, los cambios se aplican al tocar **Guardar**.
 
-1. **+ Agregar diapositiva** y elegí una o varias fotos. Conviene que sean horizontales, con la pieza en el centro.
-2. Para cada diapositiva completá:
-   - **Título** y **subtítulo:** el texto sobre la foto. Ambos son opcionales.
-   - **El botón lleva a:** una categoría, todos los productos o "Sin botón".
-   - **Texto del botón:** por ejemplo "Ver escallas".
+1. **+ Agregar diapositiva** y elegí una foto. Se abre el recortador dos veces:
+   - **Versión escritorio (horizontal):** para computadoras y tablets.
+   - **Versión celular (vertical):** podés recortar la misma foto o tocar **Usar otra foto**. Si cancelás este paso, en celulares se usa la horizontal recortada al centro.
+
+   En el recortador, arrastrá la foto para encuadrarla y usá el **zoom** (en el celular también se puede pellizcar). Lo que queda dentro del marco es lo que se ve en la web.
+2. Completá lo que quieras. Todo es **opcional** y la **vista previa** muestra cómo queda en escritorio y en celular mientras escribís:
+   - **Título** y **subtítulo:** el texto sobre la foto.
+   - **Botón:** a dónde lleva (una categoría, todos los productos, o "Sin botón") y su texto, por ejemplo "Ver escallas".
    - **Activa:** apagada, la diapositiva queda guardada pero no se muestra.
-3. **← →** cambian el orden y **Cambiar foto** reemplaza la imagen.
+3. Debajo de cada vista previa, **Cambiar foto** vuelve a abrir el recortador para ese formato. **← →** cambian el orden.
 4. **Guardar**.
 
 > Si no hay ninguna diapositiva activa, la web muestra 3 de ejemplo para que la portada nunca quede vacía.
+
+## Colores
+
+Pestaña **Colores**. Cambia el **fondo de la página** y el **encabezado** (la franja de anuncios y la barra con el logo).
+
+- Elegí el color con el cuadradito, escribí el código (ej: `#e4ccbf`) o tocá uno de la paleta de Munay.
+- **Color de marca** vuelve al original.
+- La letra del encabezado se pone beige o chocolate sola, según lo que se lea mejor.
+- Si el fondo elegido hace difícil leer el texto, aparece un aviso.
+- La vista previa muestra cómo queda. Se aplica al tocar **Guardar** y se ve en la web al recargarla.
 
 ## Dar de baja
 

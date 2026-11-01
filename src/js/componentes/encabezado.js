@@ -15,18 +15,41 @@
  * y el atributo `hidden`, así también son accesibles por teclado.
  */
 
-import { SITIO } from '../../config.js';
+import { ANUNCIOS, SITIO } from '../../config.js';
 import { categoriasPrincipales, subcategorias } from '../servicios/catalogo.js';
 import { rutaCategoria } from '../utilidades/enlaces.js';
 import { esc } from '../utilidades/html.js';
 import { ICONOS } from './iconos.js';
 
-/** Franja superior con los mensajes de envíos. */
+/** Milisegundos que se ve cada mensaje de la franja superior. */
+const INTERVALO_ANUNCIO = 3000;
+
+/**
+ * Franja superior: muestra los mensajes de `ANUNCIOS` de a uno, en una sola
+ * línea, con un fundido. Se pausa mientras el puntero está encima.
+ * Los lectores de pantalla leen todos los mensajes juntos (no cambian solos).
+ */
 export function renderAnuncio(elemento) {
   elemento.innerHTML = `
-    <span>${SITIO.envios.titulo}</span>
-    <span class="anuncio__separador" aria-hidden="true">·</span>
-    <span>${SITIO.envios.gratisLocal}</span>`;
+    <p class="visualmente-oculto">${ANUNCIOS.join('. ')}</p>
+    <div class="anuncio__mensajes" aria-hidden="true">
+      ${ANUNCIOS.map((texto, i) => `<span class="anuncio__mensaje${i === 0 ? ' es-activo' : ''}">${esc(texto)}</span>`).join('')}
+    </div>`;
+
+  const mensajes = [...elemento.querySelectorAll('.anuncio__mensaje')];
+  if (mensajes.length < 2) return;
+
+  let actual = 0;
+  let pausado = false;
+  elemento.addEventListener('pointerenter', () => (pausado = true));
+  elemento.addEventListener('pointerleave', () => (pausado = false));
+
+  setInterval(() => {
+    if (pausado || document.hidden) return;
+    mensajes[actual].classList.remove('es-activo');
+    actual = (actual + 1) % mensajes.length;
+    mensajes[actual].classList.add('es-activo');
+  }, INTERVALO_ANUNCIO);
 }
 
 /**

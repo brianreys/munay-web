@@ -1,5 +1,5 @@
 /**
- * Página de inicio: carrusel, beneficios, productos, "Sobre Munay" y contacto.
+ * Página de inicio: carrusel, productos, "Sobre Munay" y contacto.
  */
 
 import { SITIO, SOBRE_MUNAY } from '../../config.js';
@@ -23,13 +23,6 @@ export function vistaInicio({ contenedor, catalogo }) {
     <section class="portada" aria-label="Novedades">
       <div class="carrusel" data-carrusel></div>
     </section>
-
-    <ul class="beneficios contenedor" aria-label="Beneficios">
-      <li>${ICONOS.camion}<span>${SITIO.envios.titulo}</span></li>
-      <li>${ICONOS.ubicacion}<span>${SITIO.envios.gratisLocal}</span></li>
-      <li>${ICONOS.mano}<span>Piezas hechas a mano</span></li>
-      <li>${ICONOS.mensaje}<span>Consultas por WhatsApp e Instagram</span></li>
-    </ul>
 
     <section class="seccion contenedor" aria-labelledby="titulo-piezas">
       <header class="seccion__encabezado">

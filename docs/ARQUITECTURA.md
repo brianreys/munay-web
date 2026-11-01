@@ -59,7 +59,7 @@
 1. `src/admin/main.js` le pide al **repositorio** la usuaria actual.
    - En modo Supabase verifica que haya sesión y que la cuenta figure en `administradores`; si no, muestra el login.
    - En modo demo entra directo.
-2. El router del panel muestra la **lista** (`#/`), el **editor** (`#/nuevo`, `#/editar/<id>`) las **categorías** (`#/categorias`) o la **portada** (`#/portada`, el carrusel de inicio). Si el editor tiene cambios sin guardar, avisa antes de salir. Cada vista carga sus datos al abrirse, así siempre ve las categorías al día.
+2. El router del panel muestra la **lista** (`#/`), el **editor** (`#/nuevo`, `#/editar/<id>`) las **categorías** (`#/categorias`) la **portada** (`#/portada`, el carrusel de inicio, con un recortador de fotos en `componentes/recortador.js`) o los **colores** (`#/colores`, guardados en la tabla `ajustes` y aplicados por `js/servicios/apariencia.js`). Si el editor tiene cambios sin guardar, avisa antes de salir. Cada vista carga sus datos al abrirse, así siempre ve las categorías al día.
 3. El **repositorio** (`src/admin/servicios/repositorio.js`) ofrece las mismas funciones con dos implementaciones:
    - `repositorio-supabase.js`: escribe en la base y sube las fotos a Storage, en la carpeta `productos/<id-producto>/`.
    - `repositorio-demo.js`: guarda todo en `localStorage`. La web pública lee de ahí, así se puede probar el circuito completo sin Supabase.

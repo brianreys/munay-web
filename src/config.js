@@ -29,6 +29,13 @@ export const SITIO = {
   },
 };
 
+/** Mensajes de la franja superior: se muestran de a uno, cada 3 segundos. */
+export const ANUNCIOS = [
+  SITIO.envios.titulo,
+  SITIO.envios.gratisLocal,
+  'Consultas por WhatsApp e Instagram',
+];
+
 /** Textos de la sección "Sobre Munay" (provisorios, para editar). */
 export const SOBRE_MUNAY = {
   titulo: 'Sobre Munay',

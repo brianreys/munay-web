@@ -22,7 +22,8 @@
 Pendiente de esta etapa:
 
 - [x] Probar contra Supabase real.
-- [x] Gestión de las diapositivas de la portada desde el panel (pestaña **Portada**).
+- [x] Gestión de las diapositivas de la portada desde el panel (pestaña **Portada**), con recorte para escritorio y celular.
+- [x] Colores de fondo y encabezado editables (pestaña **Colores**).
 - [ ] Ordenar los productos entre sí. Hoy se hace con "Destacado" y el orden de alta.
 
 ## 🔜 Etapa 3 · Carrito y pedido por WhatsApp

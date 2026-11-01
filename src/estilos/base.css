@@ -9,12 +9,18 @@
   --color-beige: #e4ccbf;
   --color-terracota: #93341d;
 
-  /* Tonos derivados para superficies y bordes */
-  --color-beige-claro: #ecdcd2;
-  --color-beige-oscuro: #d4b6a6;
+  /* Colores editables desde el panel (pestaña Colores). Estos son los de
+     marca; la web los reemplaza al cargar (ver js/servicios/apariencia.js). */
+  --color-fondo: var(--color-beige);
+  --color-encabezado: var(--color-chocolate);
+  --color-encabezado-texto: var(--color-beige);
+
+  /* Tonos derivados del fondo para superficies y bordes.
+     Con el fondo de marca dan #ecdcd2 y #d4b6a6. */
+  --color-beige-claro: color-mix(in srgb, var(--color-fondo) 70%, #fff);
+  --color-beige-oscuro: color-mix(in srgb, var(--color-fondo) 87%, var(--color-chocolate));
   --color-texto: var(--color-chocolate);
   --color-texto-suave: #7d5446;
-  --color-fondo: var(--color-beige);
 
   /* Tipografía */
   --fuente-marca: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;

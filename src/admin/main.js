@@ -45,6 +45,7 @@ async function arrancarPanel(usuario) {
       <a href="#/" data-seccion="productos">Productos</a>
       <a href="#/categorias" data-seccion="categorias">Categorías</a>
       <a href="#/portada" data-seccion="portada">Portada</a>
+      <a href="#/colores" data-seccion="colores">Colores</a>
     </nav>
     <main id="vista" class="admin-vista" tabindex="-1"></main>
   `;
@@ -52,7 +53,7 @@ async function arrancarPanel(usuario) {
   // Marca la pestaña de la sección actual (el editor cuenta como "Productos").
   const marcarSeccion = () => {
     const ruta = window.location.hash.replace(/^#\/?/, '').split('/')[0];
-    const actual = ['categorias', 'portada'].includes(ruta) ? ruta : 'productos';
+    const actual = ['categorias', 'portada', 'colores'].includes(ruta) ? ruta : 'productos';
     raiz.querySelectorAll('[data-seccion]').forEach((enlace) => {
       if (enlace.dataset.seccion === actual) enlace.setAttribute('aria-current', 'page');
       else enlace.removeAttribute('aria-current');
