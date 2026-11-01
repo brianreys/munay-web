@@ -1,0 +1,491 @@
+/* ==========================================================================
+   COMPONENTES · botones, chips, etiquetas, carrusel, tarjetas, detalle
+   ========================================================================== */
+
+/* ----- Botones ----- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 28px;
+  border: 1px solid var(--color-chocolate);
+  border-radius: var(--radio);
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background var(--transicion), color var(--transicion), border-color var(--transicion);
+}
+
+.boton:hover {
+  border-color: var(--color-terracota);
+  background: var(--color-terracota);
+}
+
+.boton--contorno {
+  background: transparent;
+  color: var(--color-chocolate);
+}
+
+.boton--contorno:hover {
+  border-color: var(--color-chocolate);
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+}
+
+/* Sobre fotos (carrusel) */
+.boton--claro {
+  border-color: var(--color-beige);
+  background: var(--color-beige);
+  color: var(--color-chocolate);
+}
+
+.boton--claro:hover {
+  border-color: var(--color-beige);
+  background: transparent;
+  color: var(--color-beige);
+}
+
+.boton--ancho {
+  width: 100%;
+}
+
+/* ----- Chips (filtros y variantes) ----- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid var(--color-beige-oscuro);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 400;
+  transition: border-color var(--transicion), background var(--transicion), color var(--transicion);
+}
+
+.chip:hover {
+  border-color: var(--color-chocolate);
+}
+
+.chip[aria-current='page'],
+.chip[aria-pressed='true'] {
+  border-color: var(--color-chocolate);
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+}
+
+.chip--secundario {
+  min-height: 34px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+}
+
+/* Variante sin stock: se puede elegir, pero se ve tachada */
+.chip--agotado {
+  color: var(--color-texto-suave);
+  text-decoration: line-through;
+}
+
+/* ----- Etiqueta "Sin stock" ----- */
+.etiqueta {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  background: var(--color-terracota);
+  color: var(--color-beige);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.etiqueta--en-linea {
+  position: static;
+  display: inline-block;
+}
+
+/* ----- Filtros ----- */
+.filtros {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.filtros__fila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ----- Grilla y tarjetas de producto ----- */
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px 24px;
+}
+
+@media (max-width: 1000px) {
+  .grilla {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .grilla {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 12px;
+  }
+}
+
+.tarjeta__enlace {
+  display: block;
+}
+
+.tarjeta__imagen {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: var(--color-beige-claro);
+}
+
+.tarjeta__foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease, opacity 0.4s ease;
+}
+
+/* Al pasar el mouse: zoom suave, o cambio a la segunda foto si existe */
+/* Fotos que rotan sobre la portada (ver js/componentes/rotacion-fotos.js) */
+.tarjeta__foto--extra {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.tarjeta__foto--activa {
+  opacity: 1;
+}
+
+/* Zoom suave al pasar el puntero, sobre la foto que se esté viendo */
+.tarjeta__enlace:hover .tarjeta__foto {
+  transform: scale(1.04);
+}
+
+.tarjeta__sin-foto {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--fuente-marca);
+  font-size: 2rem;
+  opacity: 0.4;
+}
+
+/* Con `filter: opacity()` y no `opacity`, para no pisar el fundido de las fotos que rotan */
+.tarjeta--sin-stock .tarjeta__foto {
+  filter: grayscale(0.35) opacity(0.75);
+}
+
+.tarjeta__nombre {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.tarjeta__detalle {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.tarjeta__precio {
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* ----- Estado vacío ----- */
+.vacio {
+  max-width: 480px;
+  margin-inline: auto;
+  padding-block: 48px;
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+.vacio .seccion__titulo,
+.vacio__titulo {
+  margin-bottom: 12px;
+  font-family: var(--fuente-marca);
+  font-size: 1.8rem;
+  color: var(--color-texto);
+}
+
+.vacio .boton {
+  margin-top: 24px;
+}
+
+/* ----- Carrusel de portada ----- */
+.carrusel {
+  position: relative;
+  height: clamp(420px, 72vh, 680px);
+  overflow: hidden;
+  background: var(--color-chocolate);
+}
+
+.carrusel__pista,
+.carrusel__diapositiva {
+  position: absolute;
+  inset: 0;
+}
+
+.carrusel__diapositiva {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.carrusel__diapositiva.es-activa {
+  opacity: 1;
+}
+
+.carrusel__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+
+/* Degradado chocolate para que el texto se lea sobre cualquier foto */
+.carrusel__diapositiva::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(99 56 44 / 0.75) 0%, rgb(99 56 44 / 0.15) 55%, transparent 100%);
+}
+
+.carrusel__texto {
+  position: absolute;
+  inset: auto 0 64px;
+  z-index: 1;
+  padding-inline: var(--margen-lateral);
+  color: var(--color-beige);
+  text-align: center;
+}
+
+.carrusel__titulo {
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-weight: 500;
+}
+
+.carrusel__subtitulo {
+  margin: 8px 0 24px;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+.carrusel__flecha {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(228 204 191 / 0.5);
+  border-radius: 50%;
+  background: rgb(99 56 44 / 0.25);
+  color: var(--color-beige);
+  transform: translateY(-50%);
+  transition: background var(--transicion);
+}
+
+.carrusel__flecha:hover {
+  background: rgb(99 56 44 / 0.6);
+}
+
+.carrusel__flecha--anterior {
+  left: var(--margen-lateral);
+}
+
+.carrusel__flecha--siguiente {
+  right: var(--margen-lateral);
+}
+
+.carrusel__puntos {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.carrusel__punto {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 1px solid var(--color-beige);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.carrusel__punto[aria-current='true'] {
+  background: var(--color-beige);
+}
+
+@media (max-width: 680px) {
+  .carrusel__flecha {
+    display: none; /* en celular se navega deslizando o con los puntos */
+  }
+}
+
+/* ----- Detalle de producto ----- */
+.detalle {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 24px 56px;
+  padding-block: 32px var(--espacio-seccion);
+}
+
+.migas {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.migas a:hover {
+  text-decoration: underline;
+}
+
+.galeria__principal {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-beige-claro);
+}
+
+.galeria__principal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.galeria__principal--vacia {
+  display: grid;
+  place-items: center;
+  font-family: var(--fuente-marca);
+  font-size: 3rem;
+  opacity: 0.4;
+}
+
+.galeria__miniaturas {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.galeria__miniatura {
+  flex: 0 0 72px;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  opacity: 0.6;
+  transition: opacity var(--transicion), border-color var(--transicion);
+}
+
+.galeria__miniatura img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.galeria__miniatura:hover,
+.galeria__miniatura[aria-current='true'] {
+  border-color: var(--color-chocolate);
+  opacity: 1;
+}
+
+.detalle__info {
+  align-self: start;
+  position: sticky;
+  top: 160px;
+}
+
+.detalle__nombre {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+}
+
+.detalle__precio {
+  margin-top: 8px;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.detalle__stock {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.variantes {
+  margin-top: 28px;
+}
+
+.variantes__titulo {
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.variantes__opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detalle__acciones {
+  display: grid;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.detalle__descripcion {
+  display: grid;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-beige-oscuro);
+}
+
+.detalle__envio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.detalle__envio svg {
+  flex-shrink: 0;
+  color: var(--color-terracota);
+}
+
+@media (max-width: 760px) {
+  .detalle {
+    grid-template-columns: 1fr;
+    padding-top: 20px;
+  }
+
+  .detalle__info {
+    position: static;
+  }
+}

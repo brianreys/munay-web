@@ -1,0 +1,165 @@
+/* ==========================================================================
+   BASE · variables de diseño (tokens), reset y tipografía
+   Para cambiar colores o fuentes de toda la web, editar solo :root.
+   ========================================================================== */
+
+:root {
+  /* Paleta de marca (guía Munay.docx) */
+  --color-chocolate: #63382c;
+  --color-beige: #e4ccbf;
+  --color-terracota: #93341d;
+
+  /* Tonos derivados para superficies y bordes */
+  --color-beige-claro: #ecdcd2;
+  --color-beige-oscuro: #d4b6a6;
+  --color-texto: var(--color-chocolate);
+  --color-texto-suave: #7d5446;
+  --color-fondo: var(--color-beige);
+
+  /* Tipografía */
+  --fuente-marca: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --fuente-texto: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Espaciado y medidas */
+  --ancho-maximo: 1200px;
+  --margen-lateral: clamp(16px, 4vw, 40px);
+  --espacio-seccion: clamp(48px, 8vw, 96px);
+  --radio: 2px;
+  --sombra-suave: 0 8px 24px rgb(99 56 44 / 0.12);
+  --transicion: 0.25s ease;
+}
+
+/* ----- Reset mínimo ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+figure,
+fieldset {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+fieldset {
+  padding: 0;
+  border: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ----- Documento ----- */
+html {
+  scroll-padding-top: 140px; /* deja lugar para el encabezado fijo al usar anclas */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+  outline: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-marca);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-terracota);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+}
+
+/* ----- Utilidades ----- */
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding-inline: var(--margen-lateral);
+}
+
+/* Oculto a la vista pero leído por lectores de pantalla */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.saltar-contenido {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 8px 16px;
+  background: var(--color-beige);
+  color: var(--color-chocolate);
+}
+
+.saltar-contenido:focus {
+  top: 8px;
+}
+
+.cargando {
+  padding: var(--espacio-seccion) var(--margen-lateral);
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

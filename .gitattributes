@@ -1,0 +1,5 @@
+# Saltos de línea LF en el repositorio (igual que .editorconfig).
+* text=auto eol=lf
+*.jpg binary
+*.png binary
+*.webp binary

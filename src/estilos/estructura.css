@@ -1,0 +1,474 @@
+/* ==========================================================================
+   ESTRUCTURA · anuncio, encabezado, navegación, secciones y pie
+   ========================================================================== */
+
+/* ----- Barra de anuncio ----- */
+.anuncio {
+  padding: 6px var(--margen-lateral);
+  border-bottom: 1px solid rgb(228 204 191 / 0.2); /* separa del encabezado, del mismo color */
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.anuncio__separador {
+  margin-inline: 10px;
+}
+
+/* En celular los dos mensajes van en líneas separadas */
+@media (max-width: 480px) {
+  .anuncio span:not(.anuncio__separador) {
+    display: block;
+  }
+
+  .anuncio__separador {
+    display: none;
+  }
+}
+
+/* ----- Encabezado (fondo chocolate, letra beige: logo versión 2) ----- */
+.encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+}
+
+.encabezado__barra {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding-block: 14px 6px;
+}
+
+.logo {
+  grid-column: 2;
+  justify-self: center;
+  font-family: var(--fuente-marca);
+  font-size: clamp(2.4rem, 5vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.encabezado__social {
+  grid-column: 3;
+  justify-self: end;
+  padding: 10px;
+  transition: opacity var(--transicion);
+}
+
+.encabezado__social:hover {
+  opacity: 0.7;
+}
+
+.encabezado__boton-menu {
+  display: none;
+  grid-column: 1;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Ícono de hamburguesa dibujado con CSS (se transforma en X al abrir) */
+.hamburguesa,
+.hamburguesa::before,
+.hamburguesa::after {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  margin-inline: auto;
+  background: currentColor;
+  transition: transform var(--transicion), opacity var(--transicion);
+}
+
+.hamburguesa {
+  position: relative;
+}
+
+.hamburguesa::before,
+.hamburguesa::after {
+  content: '';
+  position: absolute;
+}
+
+.hamburguesa::before {
+  top: -7px;
+}
+
+.hamburguesa::after {
+  top: 7px;
+}
+
+.esta-abierto .hamburguesa {
+  background: transparent;
+}
+
+.esta-abierto .hamburguesa::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.esta-abierto .hamburguesa::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ----- Navegación (escritorio) ----- */
+.navegacion__lista {
+  display: flex;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 48px);
+  padding-block: 4px 12px;
+}
+
+/* Ítems de primer nivel: enlaces y el botón "Productos" comparten estilo */
+.navegacion__lista > li > a,
+.navegacion__desplegar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: border-color var(--transicion);
+}
+
+.navegacion__lista > li > a:hover,
+.navegacion__lista > li > a[aria-current='page'],
+.navegacion__desplegar:hover,
+.navegacion__desplegar[aria-current='page'] {
+  border-color: currentColor;
+}
+
+/* Flechita de los desplegables: gira al abrir */
+[data-desplegar] svg {
+  flex-shrink: 0;
+  transition: transform var(--transicion);
+}
+
+[data-desplegar][aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+/* Submenú de Productos (computadora: panel flotante bajo "Productos") */
+.navegacion__item-submenu {
+  position: relative;
+}
+
+.submenu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  width: 260px;
+  padding: 12px 0;
+  background: var(--color-beige-claro);
+  color: var(--color-chocolate);
+  box-shadow: var(--sombra-suave);
+  text-align: left;
+  transform: translateX(-50%);
+  animation: aparecer 0.2s ease;
+}
+
+.submenu[hidden],
+.submenu__hijos[hidden] {
+  display: none;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+}
+
+/* Filas del submenú: categorías (enlace o botón) y "ver todo" */
+.submenu__ver-todo,
+.submenu__categoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 24px;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.submenu__ver-todo {
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.submenu__categoria {
+  font-family: var(--fuente-marca);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.submenu__hijos {
+  padding: 0 24px 8px 36px;
+}
+
+.submenu__hijos a {
+  display: block;
+  padding-block: 5px;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+}
+
+.submenu a:hover,
+.submenu__categoria:hover {
+  color: var(--color-terracota);
+}
+
+/* ----- Navegación (celular) ----- */
+@media (max-width: 760px) {
+  .encabezado__barra {
+    padding-block: 10px;
+  }
+
+  .encabezado__boton-menu {
+    display: block;
+  }
+
+  .navegacion {
+    display: none;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    border-top: 1px solid rgb(228 204 191 / 0.2);
+  }
+
+  .esta-abierto .navegacion {
+    display: block;
+  }
+
+  .navegacion__lista {
+    flex-direction: column;
+    gap: 0;
+    padding: 8px var(--margen-lateral) 20px;
+  }
+
+  .navegacion__lista > li > a,
+  .navegacion__desplegar {
+    width: 100%;
+    padding-block: 12px;
+  }
+
+  .navegacion__desplegar {
+    justify-content: space-between;
+  }
+
+  /* En celular el submenú se abre dentro del menú, como acordeón */
+  .submenu {
+    position: static;
+    width: auto;
+    padding: 0 0 8px;
+    background: none;
+    color: inherit;
+    box-shadow: none;
+    transform: none;
+    animation: none;
+  }
+
+  .submenu__ver-todo,
+  .submenu__categoria {
+    padding: 10px 0 10px 16px;
+  }
+
+  .submenu__ver-todo {
+    color: inherit;
+    opacity: 0.75;
+  }
+
+  .submenu__hijos {
+    padding: 0 0 8px 32px;
+  }
+
+  .submenu__hijos a {
+    padding-block: 8px;
+    color: inherit;
+    opacity: 0.85;
+  }
+
+  .submenu a:hover,
+  .submenu__categoria:hover {
+    color: inherit;
+    opacity: 1;
+  }
+}
+
+/* ----- Secciones genéricas ----- */
+.seccion {
+  padding-block: var(--espacio-seccion);
+}
+
+.seccion__encabezado {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.sobretitulo {
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-terracota);
+}
+
+.seccion__titulo {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+}
+
+.seccion__conteo {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.seccion__accion {
+  margin-top: 48px;
+  text-align: center;
+}
+
+/* ----- Beneficios ----- */
+.beneficios {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 48px;
+  padding-block: 28px;
+  border-bottom: 1px solid var(--color-beige-oscuro);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.beneficios li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.beneficios svg {
+  color: var(--color-terracota);
+}
+
+/* ----- Sobre Munay ----- */
+.sobre {
+  padding-block: var(--espacio-seccion);
+  background: var(--color-beige-claro);
+  text-align: center;
+}
+
+.sobre__contenido {
+  max-width: 720px;
+}
+
+.sobre__contenido p:not(.sobretitulo) {
+  margin-top: 20px;
+  font-size: 1.05rem;
+}
+
+/* ----- Contacto ----- */
+.contacto {
+  padding-block: var(--espacio-seccion);
+  text-align: center;
+}
+
+.contacto > p {
+  margin-top: 12px;
+  color: var(--color-texto-suave);
+}
+
+.contacto__botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+/* ----- Pie ----- */
+.pie {
+  background: var(--color-chocolate);
+  color: var(--color-beige);
+}
+
+.pie__columnas {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+  padding-block: 56px 40px;
+}
+
+.logo--pie {
+  font-size: 2.6rem;
+}
+
+.pie__marca p {
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
+.pie__titulo {
+  margin-bottom: 14px;
+  font-family: var(--fuente-texto);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.pie__lista {
+  display: grid;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.pie__lista a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.pie__contacto {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pie__legal {
+  padding: 18px var(--margen-lateral);
+  border-top: 1px solid rgb(228 204 191 / 0.15);
+  font-size: 0.75rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (max-width: 760px) {
+  .pie__columnas {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    text-align: center;
+  }
+
+  .pie__lista {
+    justify-items: center;
+  }
+}

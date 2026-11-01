@@ -1,0 +1,51 @@
+# Publica la web en GitHub Pages cada vez que se suben cambios a `main`.
+# También se puede lanzar a mano: pestaña Actions → "Publicar en GitHub Pages" → Run workflow.
+# Requisito (una sola vez): Settings → Pages → Source: "GitHub Actions".
+
+name: Publicar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se suben cambios seguidos, solo se publica el último.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # La web queda en https://<usuario>.github.io/<repositorio>/, así que las
+      # rutas se arman con esa carpeta (salvo un repositorio <usuario>.github.io).
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ endsWith(github.event.repository.name, '.github.io') && '/' || format('/{0}/', github.event.repository.name) }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - id: despliegue
+        uses: actions/deploy-pages@v4
