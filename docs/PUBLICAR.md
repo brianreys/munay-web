@@ -12,7 +12,27 @@ La web publicada lee los datos directo de Supabase. Por eso, cargar productos de
 
 La web es un sitio estático (carpeta `dist/` generada por `npm run build`), así que se puede publicar gratis en Netlify. Vercel también sirve, pero su plan gratuito no permite uso comercial.
 
-## Opción recomendada: Netlify conectado a GitHub
+## Prueba gratuita: GitHub Pages
+
+Deja la web en `https://<usuario>.github.io/munay-web/`, sin costo. El workflow [`.github/workflows/publicar.yml`](../.github/workflows/publicar.yml) la vuelve a publicar en cada `git push`. Los datos de Supabase salen de `.env.production`.
+
+> En el plan gratuito de GitHub, Pages solo funciona con repositorios **públicos**: el código queda visible. No hay claves secretas en el repositorio (`.env.local` está excluido y la clave de Supabase que se sube es la pública).
+
+1. En <https://github.com/new>: nombre `munay-web`, visibilidad **Public**, sin README ni .gitignore.
+2. Desde la carpeta `munay-web`, conectar y subir. La primera vez Git abre el navegador para iniciar sesión en GitHub.
+
+   ```bash
+   git remote add origin https://github.com/<usuario>/munay-web.git
+   git push -u origin main
+   ```
+
+3. En el repositorio: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+4. Pestaña **Actions → Publicar en GitHub Pages → Run workflow**. Si la ejecución del primer push falló, es porque Pages todavía no estaba activado; esta la reemplaza.
+5. En 1–2 minutos queda en `https://<usuario>.github.io/munay-web/`, con el panel en `.../munay-web/admin.html`.
+
+Para publicar cambios: `git add -A`, `git commit -m "..."` y `git push`.
+
+## Opción recomendada para el lanzamiento: Netlify conectado a GitHub
 
 Cada vez que se suben cambios al repositorio, la web se actualiza sola.
 
@@ -23,7 +43,7 @@ Cada vez que se suben cambios al repositorio, la web se actualiza sola.
    - Base directory: `munay-web`, o vacío si el repositorio es solo esta carpeta
    - Build command: `npm run build`
    - Publish directory: `dist`
-5. **Site configuration → Environment variables**: agregar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+5. Las variables de Supabase ya están en `.env.production`, así que no hace falta cargarlas en Netlify.
 6. Deploy. Netlify da una dirección del tipo `munay.netlify.app`.
 
 ## Conectar el dominio propio
