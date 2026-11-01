@@ -236,6 +236,7 @@
    en celular. Así la foto se ve tal cual se recortó. */
 .carrusel {
   position: relative;
+  width: 100%; /* siempre de borde a borde, aunque el alto llegue al máximo */
   aspect-ratio: 16 / 7;
   min-height: 360px;
   max-height: 85vh;
