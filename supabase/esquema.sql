@@ -2,7 +2,8 @@
 -- MUNAY · Esquema de base de datos (Supabase / PostgreSQL)
 -- -----------------------------------------------------------------------------
 -- Cómo usarlo: Supabase → SQL Editor → pegar este archivo completo → Run.
--- Luego ejecutar `semilla.sql` para cargar las categorías iniciales.
+-- Luego ejecutar `semilla.sql` (categorías iniciales) y, por último, los
+-- archivos de `migraciones/` en orden (02 en adelante; se pueden repetir).
 -- Explicación del modelo: docs/MODELO-DE-DATOS.md
 -- =============================================================================
 

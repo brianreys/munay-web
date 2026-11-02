@@ -24,6 +24,13 @@
  *                                           `archivo` escritorio, `archivoMovil` celular)
  *   obtenerColores()                      → { colorFondo, colorEncabezado }
  *   guardarColores(colores)
+ *   listarVentas()                        → Venta[] (las más nuevas primero)
+ *   registrarVenta({ varianteId, cantidad, precioUnitario, nota })
+ *                                         → descuenta el stock (si la variante lo cuenta)
+ *   anularVenta(id)                       → devuelve las unidades al stock
+ *
+ * Variantes: `cantidad` es un número de unidades, o null = "sin contar"
+ * (funciona solo con En stock / Sin stock). Con número, "en stock" = cantidad > 0.
  *
  * Forma de un Producto: igual a la de `src/datos/catalogo-demo.js`. Las fotos
  * nuevas traen además `archivo` (Blob optimizado) y todavía no tienen `ruta`.

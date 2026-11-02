@@ -1,5 +1,5 @@
 /**
- * Router del panel (hash): #/ lista · #/nuevo · #/editar/<id> · #/categorias · #/portada · #/colores
+ * Router del panel (hash): #/ lista · #/nuevo · #/editar/<id> · #/categorias · #/portada · #/colores · #/ventas
  *
  * Igual que el de la web pública, pero además permite que una vista
  * impida salir (`puedeSalir`), para no perder cambios sin guardar.
@@ -10,6 +10,7 @@ import { vistaColores } from './vistas/colores.js';
 import { vistaEditor } from './vistas/editor.js';
 import { vistaLista } from './vistas/lista.js';
 import { vistaPortada } from './vistas/portada.js';
+import { vistaVentas } from './vistas/ventas.js';
 
 const RUTAS = [
   { patron: /^$/, vista: vistaLista },
@@ -18,6 +19,7 @@ const RUTAS = [
   { patron: /^categorias$/, vista: vistaCategorias },
   { patron: /^portada$/, vista: vistaPortada },
   { patron: /^colores$/, vista: vistaColores },
+  { patron: /^ventas$/, vista: vistaVentas },
 ];
 
 /**

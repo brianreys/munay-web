@@ -49,8 +49,8 @@ munay-web/
 │   ├── config.js               Textos y datos de contacto editables
 │   ├── admin/                  Panel de administración
 │   │   ├── main.js             Punto de entrada: sesión + estructura + router
-│   │   ├── router.js           #/ lista · #/nuevo · #/editar/<id> · #/categorias · #/portada · #/colores
-│   │   ├── vistas/             login.js, lista.js, editor.js, categorias.js, portada.js, colores.js
+│   │   ├── router.js           #/ lista · #/nuevo · #/editar/<id> · #/ventas · #/categorias · #/portada · #/colores
+│   │   ├── vistas/             login.js, lista.js, editor.js, ventas.js, categorias.js, portada.js, colores.js
 │   │   ├── componentes/        avisos.js (mensajes), recortador.js (recorte de fotos)
 │   │   ├── servicios/          repositorio (demo o Supabase) para escribir datos
 │   │   ├── utilidades/         optimización de imágenes, slugs, reglas de categorías

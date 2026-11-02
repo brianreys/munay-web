@@ -53,13 +53,14 @@ Entrá a `/admin.html` con una de las cuentas creadas y seguí la [guía del pan
 
 ## 6. Migraciones (actualizaciones de la base)
 
-Cuando la web suma funciones que necesitan cambios en la base, el cambio se agrega como un archivo en [`supabase/migraciones/`](../supabase/migraciones/). Los proyectos creados **antes** de ese cambio tienen que ejecutarlo una vez: **SQL Editor → New query → pegar el archivo → Run**. Los proyectos nuevos no lo necesitan, porque `esquema.sql` ya lo incluye.
+Cuando la web suma funciones que necesitan cambios en la base, el cambio se agrega como un archivo en [`supabase/migraciones/`](../supabase/migraciones/). Los proyectos creados **antes** de ese cambio tienen que ejecutarlo una vez: **SQL Editor → New query → pegar el archivo → Run**. En un proyecto **nuevo** se ejecutan después de `esquema.sql` y `semilla.sql`, en orden. Todos se pueden repetir sin problema.
 
 | Archivo | Qué agrega |
 | --- | --- |
 | `01-portada-movil-y-colores.sql` | Foto vertical para celular en la portada y la tabla `ajustes` (colores) |
+| `02-stock-y-ventas.sql` | Cantidad de unidades por variante, tabla `ventas` y las funciones que registran y anulan ventas |
 
-Si falta una migración, el panel lo avisa al guardar, y la web pública sigue funcionando con la portada y los colores predeterminados.
+Si falta una migración, el panel muestra un aviso pidiendo ejecutarla (con la 02 pendiente, la lista de productos no carga). La web pública sigue funcionando igual.
 
 ## Límites del plan gratuito (para tener en cuenta)
 

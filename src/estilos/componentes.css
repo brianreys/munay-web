@@ -378,6 +378,16 @@
   text-decoration: underline;
 }
 
+/* En escritorio la galería se limita para que la foto entre completa en la
+   pantalla (alto de ventana menos el encabezado fijo y un margen). */
+@media (min-width: 761px) {
+  .detalle__galeria {
+    justify-self: center;
+    width: 100%;
+    max-width: calc((100vh - 260px) * 4 / 5);
+  }
+}
+
 .galeria__principal {
   aspect-ratio: 4 / 5;
   overflow: hidden;
@@ -471,6 +481,12 @@
   display: grid;
   gap: 10px;
   margin-top: 32px;
+}
+
+.detalle__nota {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+  text-align: center;
 }
 
 .detalle__descripcion {

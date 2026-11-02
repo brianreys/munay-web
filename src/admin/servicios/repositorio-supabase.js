@@ -19,7 +19,7 @@ export const modo = 'supabase';
 
 const CONSULTA_PRODUCTOS = `
   id, slug, nombre, descripcion, etiqueta_variante, estado, destacado, orden,
-  variantes ( id, nombre, precio, en_stock, visible, orden ),
+  variantes ( id, nombre, precio, en_stock, cantidad, visible, orden ),
   fotos ( id, ruta, alt, orden, variante_id, foto_categorias ( categoria_id ) )
 `;
 
@@ -99,6 +99,7 @@ function mapearProducto(fila) {
         nombre: v.nombre,
         precio: Number(v.precio),
         enStock: v.en_stock,
+        cantidad: v.cantidad,
         visible: v.visible,
         orden: v.orden,
       }))
@@ -147,6 +148,7 @@ export async function guardarProducto(producto) {
           nombre: v.nombre,
           precio: v.precio,
           en_stock: v.enStock,
+          cantidad: v.cantidad ?? null,
           visible: v.visible,
           orden: indice,
         })),
@@ -339,6 +341,56 @@ export async function guardarColores(colores) {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Ventas                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/** Últimas ventas, de la más nueva a la más vieja. */
+export async function listarVentas() {
+  const { data, error } = await supabase
+    .from('ventas')
+    .select('id, variante_id, producto_nombre, variante_nombre, cantidad, precio_unitario, nota, anulada, creado_en')
+    .order('creado_en', { ascending: false })
+    .limit(200);
+  if (error) throw traducirError(error);
+  return data.map(mapearVenta);
+}
+
+/**
+ * Registra una venta y descuenta el stock en la base, en un solo paso
+ * (función `registrar_venta` de supabase/migraciones/02-stock-y-ventas.sql).
+ */
+export async function registrarVenta({ varianteId, cantidad, precioUnitario, nota }) {
+  const { data, error } = await supabase.rpc('registrar_venta', {
+    p_variante: varianteId,
+    p_cantidad: cantidad,
+    p_precio: precioUnitario,
+    p_nota: nota,
+  });
+  if (error) throw traducirError(error);
+  return mapearVenta(data);
+}
+
+/** Anula una venta y devuelve las unidades al stock. */
+export async function anularVenta(id) {
+  const { error } = await supabase.rpc('anular_venta', { p_venta: id });
+  if (error) throw traducirError(error);
+}
+
+function mapearVenta(fila) {
+  return {
+    id: fila.id,
+    varianteId: fila.variante_id,
+    productoNombre: fila.producto_nombre,
+    varianteNombre: fila.variante_nombre,
+    cantidad: fila.cantidad,
+    precioUnitario: Number(fila.precio_unitario),
+    nota: fila.nota,
+    anulada: fila.anulada,
+    fecha: fila.creado_en,
+  };
+}
+
+/* -------------------------------------------------------------------------- */
 /* Auxiliares                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -357,10 +409,10 @@ async function borrarQuitadas(tabla, productoId, idsVigentes) {
 
 /** Convierte errores técnicos de la base en mensajes entendibles. */
 function traducirError(error) {
-  // Columna o tabla inexistente: la base no tiene la última migración.
-  if (['42703', '42P01', 'PGRST204', 'PGRST205'].includes(error.code)) {
+  // Columna, tabla o función inexistente: la base no tiene la última migración.
+  if (['42703', '42P01', '42883', 'PGRST202', 'PGRST204', 'PGRST205'].includes(error.code)) {
     return new Error(
-      'Falta actualizar la base de datos: ejecutá en Supabase el archivo supabase/migraciones/01-portada-movil-y-colores.sql (ver docs/SUPABASE.md).',
+      'Falta actualizar la base de datos: ejecutá en Supabase los archivos pendientes de supabase/migraciones/ (ver docs/SUPABASE.md).',
     );
   }
   if (error.code === '23505' && error.message.includes('categorias')) {

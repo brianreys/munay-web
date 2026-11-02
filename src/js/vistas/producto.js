@@ -7,7 +7,7 @@
 import { SITIO } from '../../config.js';
 import { ICONOS } from '../componentes/iconos.js';
 import { fotosDeVariante } from '../servicios/catalogo.js';
-import { enlaceWhatsapp, mensajeConsulta, rutaProducto } from '../utilidades/enlaces.js';
+import { enlaceInstagram, enlaceWhatsapp, mensajeConsulta, rutaProducto } from '../utilidades/enlaces.js';
 import { formatearPrecio } from '../utilidades/formato.js';
 import { esc } from '../utilidades/html.js';
 import { vistaNoEncontrado } from './no-encontrado.js';
@@ -62,6 +62,17 @@ export function vistaProducto(contexto) {
 
     const miniatura = evento.target.closest('[data-miniatura]');
     if (miniatura) mostrarFoto(galeria, Number(miniatura.dataset.miniatura));
+
+    // Instagram no siempre carga el mensaje del enlace: se copia al
+    // portapapeles para poder pegarlo en el chat (el enlace se abre igual).
+    const instagram = evento.target.closest('[data-instagram]');
+    if (instagram) {
+      navigator.clipboard?.writeText(instagram.dataset.mensaje)
+        .then(() => {
+          info.querySelector('[data-nota-instagram]').hidden = false;
+        })
+        .catch(() => {});
+    }
   }, { signal: control.signal });
 
   return {
@@ -141,9 +152,13 @@ function infoHtml(producto, variante) {
       <a class="boton boton--ancho" href="${enlaceWhatsapp(mensaje)}" target="_blank" rel="noopener">
         ${ICONOS.whatsapp}<span>${variante.enStock ? 'Consultar por WhatsApp' : 'Avisame cuando vuelva'}</span>
       </a>
-      <a class="boton boton--contorno boton--ancho" href="${SITIO.instagram.mensajeDirecto}" target="_blank" rel="noopener">
+      <a class="boton boton--contorno boton--ancho" href="${enlaceInstagram(mensaje)}" target="_blank" rel="noopener"
+         data-instagram data-mensaje="${esc(mensaje)}">
         ${ICONOS.instagram}<span>Escribinos por Instagram</span>
       </a>
+      <p class="detalle__nota" data-nota-instagram role="status" hidden>
+        Copiamos tu consulta: si el chat se abre vacío, pegala y enviala.
+      </p>
     </div>
 
     <div class="detalle__descripcion">${parrafos}</div>

@@ -147,6 +147,62 @@ export async function guardarColores(colores) {
   persistir({ ...datos, ajustes: normalizarColores(colores) });
 }
 
+export async function listarVentas() {
+  return structuredClone(datos.ventas ?? []);
+}
+
+/** Igual que la función `registrar_venta` de la base: valida, descuenta y guarda. */
+export async function registrarVenta({ varianteId, cantidad, precioUnitario, nota }) {
+  const producto = datos.productos.find((p) => p.variantes.some((v) => v.id === varianteId));
+  const variante = producto?.variantes.find((v) => v.id === varianteId);
+  if (!variante) throw new Error('El producto elegido ya no existe.');
+  if (!(cantidad > 0)) throw new Error('La cantidad tiene que ser mayor a cero.');
+  if (variante.cantidad != null && variante.cantidad < cantidad) {
+    throw new Error(`No alcanza el stock: quedan ${variante.cantidad} unidades.`);
+  }
+
+  const venta = {
+    id: crypto.randomUUID(),
+    varianteId,
+    productoNombre: producto.nombre,
+    varianteNombre: variante.nombre,
+    cantidad,
+    precioUnitario: precioUnitario ?? variante.precio,
+    nota: nota ?? '',
+    anulada: false,
+    fecha: new Date().toISOString(),
+  };
+  persistir({
+    ...datos,
+    productos: conCantidad(varianteId, (c) => c - cantidad),
+    ventas: [venta, ...(datos.ventas ?? [])],
+  });
+  return structuredClone(venta);
+}
+
+export async function anularVenta(id) {
+  const venta = (datos.ventas ?? []).find((v) => v.id === id);
+  if (!venta) throw new Error('La venta no existe.');
+  if (venta.anulada) throw new Error('Esta venta ya estaba anulada.');
+  persistir({
+    ...datos,
+    productos: conCantidad(venta.varianteId, (c) => c + venta.cantidad),
+    ventas: datos.ventas.map((v) => (v.id === id ? { ...v, anulada: true } : v)),
+  });
+}
+
+/** Productos con la cantidad de una variante cambiada (si se cuenta) y su stock al día. */
+function conCantidad(varianteId, cambio) {
+  return datos.productos.map((p) => ({
+    ...p,
+    variantes: p.variantes.map((v) => {
+      if (v.id !== varianteId || v.cantidad == null) return v;
+      const cantidad = cambio(v.cantidad);
+      return { ...v, cantidad, enStock: cantidad > 0 };
+    }),
+  }));
+}
+
 /** Solo demo: descarta los cambios y vuelve a los datos de ejemplo. */
 export function restablecer() {
   restablecerCatalogoDemo();

@@ -314,6 +314,78 @@ textarea.campo__control {
   gap: 12px;
 }
 
+.lista-productos[hidden] {
+  display: none;
+}
+
+/* Filtro de stock + selector de vista, en una fila */
+.admin-controles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 16px;
+}
+
+.admin-controles .admin-filtros {
+  margin-bottom: 12px;
+}
+
+/* Vista "Lista": producto y stock */
+.tabla-stock {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-beige-claro);
+}
+
+.tabla-stock th,
+.tabla-stock td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-beige-oscuro);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-stock thead th {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tabla-stock tbody th {
+  font-weight: 500;
+}
+
+.tabla-stock tbody th a:hover {
+  text-decoration: underline;
+}
+
+.tabla-stock small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.tabla-stock__oculto th a {
+  opacity: 0.6;
+}
+
+.tabla-stock__variantes li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tabla-stock__agotado {
+  color: var(--color-terracota);
+}
+
+.tabla-stock__sin-contar {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
 .fila-producto {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -548,7 +620,7 @@ details[open] > .categoria-admin__resumen::after {
 
 .variante-editor {
   display: grid;
-  grid-template-columns: 1fr 140px;
+  grid-template-columns: 1fr 140px 140px; /* nombre · precio · stock */
   gap: 0 12px;
   padding: 14px;
   border: 1px solid var(--color-beige-oscuro);
@@ -724,6 +796,63 @@ details[open] > .categoria-admin__resumen::after {
 .previa__pie .boton-texto {
   padding: 4px 0;
   font-size: 0.8rem;
+}
+
+/* ----- Ventas ----- */
+.venta-nueva__numeros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.venta-nueva__total {
+  font-family: var(--fuente-marca);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.venta-nueva__aviso {
+  min-height: 1.2em;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.ventas-lista {
+  display: grid;
+}
+
+.venta {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-beige-oscuro);
+}
+
+.venta__texto {
+  display: grid;
+  min-width: 0;
+}
+
+.venta__texto span {
+  font-weight: 400;
+}
+
+.venta__texto small {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.venta__total {
+  font-weight: 500;
+}
+
+.venta--anulada .venta__texto strong,
+.venta--anulada .venta__total {
+  opacity: 0.5;
+  text-decoration: line-through;
 }
 
 /* ----- Colores ----- */
@@ -1162,7 +1291,12 @@ details[open] > .categoria-admin__resumen::after {
   }
 
   .variante-editor {
-    grid-template-columns: 1fr 110px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* En celular: el nombre arriba y precio + stock lado a lado */
+  .variante-editor__nombre {
+    grid-column: 1 / -1;
   }
 
   .editor__barra .boton {

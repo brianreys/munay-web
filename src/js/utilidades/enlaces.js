@@ -26,6 +26,18 @@ export function enlaceWhatsapp(mensaje = '') {
 }
 
 /**
+ * Enlace al mensaje directo de Instagram con un texto prearmado.
+ * Instagram no documenta oficialmente `?text=`: en algunas versiones de la
+ * app carga el mensaje y en otras lo ignora. Por eso la vista de producto
+ * además copia el mensaje al portapapeles al tocar el botón.
+ * @param {string} mensaje
+ */
+export function enlaceInstagram(mensaje = '') {
+  const texto = mensaje ? `?text=${encodeURIComponent(mensaje)}` : '';
+  return `${SITIO.instagram.mensajeDirecto}${texto}`;
+}
+
+/**
  * Mensaje de consulta para un producto. Incluye el link a la publicación
  * para que quien responda sepa exactamente de qué pieza se habla.
  */

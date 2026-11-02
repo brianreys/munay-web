@@ -22,6 +22,8 @@ Es la pantalla principal. Desde acá, sin entrar a editar, podés:
 | Marcar una variante **sin stock** | Abrí **Stock** y apagá la variante. En la web aparece "Sin stock". |
 | Buscar un producto | Escribí en el buscador |
 | Ver solo ocultos o con faltantes | Tocá los filtros de arriba |
+| Ver con stock, agotados o todos | Filtro **Con stock / Agotado / Todos**. Arranca en "Con stock". |
+| Ver solo nombres y unidades | Vista **Lista** (a la derecha). **Tarjetas** vuelve a la vista con interruptores. |
 
 Tocá el nombre o la foto de un producto para editarlo.
 
@@ -37,6 +39,7 @@ Tocá el nombre o la foto de un producto para editarlo.
 3. **Variantes:** cada opción que se puede comprar, con su **precio**.
    - Si hay una sola, dejala como "Único".
    - Para combos, agregá una variante por combinación: "Solo", "Con dije en soga", etc.
+   - **Stock (unidades):** cuántas hay. Con un número, **En stock** se calcula solo: en 0 la web muestra "Sin stock". Vacío = "sin contar": se maneja a mano con el interruptor.
    - **En stock** apagado: se muestra "Sin stock".
    - **Visible** apagado: esa opción y sus fotos desaparecen de la web.
 4. **Fotos:** tocá **+ Agregar fotos**. En el celular se puede elegir de la galería o sacar la foto en el momento. Para cada foto:
@@ -93,6 +96,19 @@ Pestaña **Colores**. Cambia el **fondo de la página** y el **encabezado** (la 
 - La letra del encabezado se pone beige o chocolate sola, según lo que se lea mejor.
 - Si el fondo elegido hace difícil leer el texto, aparece un aviso.
 - La vista previa muestra cómo queda. Se aplica al tocar **Guardar** y se ve en la web al recargarla.
+
+## Ventas
+
+Pestaña **Ventas**. Al registrar una venta se descuenta el stock.
+
+1. Elegí el **producto**: la lista muestra cuántas unidades quedan, y los agotados no se pueden elegir.
+2. Poné la **cantidad** y revisá el **precio por unidad**, que viene del producto y se puede cambiar (por ejemplo, con descuento).
+3. **Nota** opcional: cliente, medio de pago, envío.
+4. **Registrar venta**.
+
+Abajo están las últimas ventas y el total del mes. **Anular** sirve si una venta se cargó mal: queda tachada y las unidades vuelven al stock.
+
+> Si dos personas venden la última unidad al mismo tiempo, la base acepta solo una venta y a la otra le avisa que no alcanza el stock.
 
 ## Dar de baja
 

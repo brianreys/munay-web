@@ -104,6 +104,22 @@ export async function vistaEditor({ contenedor, repositorio, parametros }) {
     listaFotos.querySelector(`[data-indice="${indice}"] [data-categoria="${CSS.escape(categoriaId)}"]`)?.focus();
   }
 
+  /**
+   * Unidades en stock de una variante. Vacío = "sin contar" (se maneja solo
+   * con el interruptor En stock); con número, En stock se calcula solo.
+   */
+  function actualizarCantidad(variante, control) {
+    variante.cantidad = control.value === '' ? null : Number(control.value);
+    const interruptor = control.closest('[data-indice]').querySelector('[data-variante="enStock"]');
+    const cuenta = variante.cantidad != null && !Number.isNaN(variante.cantidad);
+    if (cuenta) {
+      variante.enStock = variante.cantidad > 0;
+      interruptor.checked = variante.enStock;
+    }
+    interruptor.disabled = cuenta;
+    interruptor.nextElementSibling.textContent = `En stock${cuenta ? ' (automático)' : ''}`;
+  }
+
   /** Copia el valor de un control del formulario al borrador. */
   function actualizarDesdeControl(control) {
     // El campo de "nueva categoría" no es parte del producto.
@@ -138,6 +154,7 @@ export async function vistaEditor({ contenedor, repositorio, parametros }) {
       const variante = borrador.variantes[indice];
       if (control.type === 'checkbox') variante[campoVariante] = control.checked;
       else if (campoVariante === 'precio') variante.precio = control.value === '' ? null : Number(control.value);
+      else if (campoVariante === 'cantidad') actualizarCantidad(variante, control);
       else variante[campoVariante] = control.value;
       return marcarModificado();
     }
@@ -297,6 +314,9 @@ export async function vistaEditor({ contenedor, repositorio, parametros }) {
       if (v.precio === null || Number.isNaN(v.precio) || v.precio < 0) {
         errores.push(`La variante "${nombre}" necesita un precio válido.`);
       }
+      if (v.cantidad != null && !(Number.isInteger(v.cantidad) && v.cantidad >= 0)) {
+        errores.push(`El stock de "${nombre}" tiene que ser un número entero de 0 en adelante (o vacío).`);
+      }
     });
     return errores;
   }
@@ -422,7 +442,7 @@ function productoNuevo(productos) {
 }
 
 function varianteNueva(nombre) {
-  return { id: crypto.randomUUID(), nombre, precio: null, enStock: true, visible: true, orden: 0 };
+  return { id: crypto.randomUUID(), nombre, precio: null, cantidad: null, enStock: true, visible: true, orden: 0 };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -528,6 +548,8 @@ function estructuraHtml(producto, esNuevo, etiquetas) {
 }
 
 function varianteHtml(variante, indice, total) {
+  // Con una cantidad cargada, "En stock" se calcula solo (0 unidades = Sin stock).
+  const cuentaStock = variante.cantidad != null;
   return `
     <li class="variante-editor" data-indice="${indice}">
       <label class="campo variante-editor__nombre">
@@ -540,10 +562,15 @@ function varianteHtml(variante, indice, total) {
         <input class="campo__control" type="number" inputmode="numeric" min="0" step="1"
                data-variante="precio" value="${variante.precio ?? ''}" />
       </label>
+      <label class="campo variante-editor__cantidad">
+        <span class="campo__etiqueta">Stock (unidades)</span>
+        <input class="campo__control" type="number" inputmode="numeric" min="0" step="1"
+               data-variante="cantidad" value="${variante.cantidad ?? ''}" placeholder="Sin contar" />
+      </label>
       <div class="variante-editor__opciones">
-        <label class="interruptor">
-          <input type="checkbox" data-variante="enStock" ${variante.enStock ? 'checked' : ''} />
-          <span class="interruptor__texto">En stock</span>
+        <label class="interruptor" ${cuentaStock ? 'title="Se calcula solo según las unidades"' : ''}>
+          <input type="checkbox" data-variante="enStock" ${variante.enStock ? 'checked' : ''} ${cuentaStock ? 'disabled' : ''} />
+          <span class="interruptor__texto">En stock${cuentaStock ? ' (automático)' : ''}</span>
         </label>
         <label class="interruptor">
           <input type="checkbox" data-variante="visible" ${variante.visible ? 'checked' : ''} />

@@ -43,7 +43,7 @@ Dos medios, en orden de complejidad:
 Lo que cambia en el modelo:
 
 - Tablas nuevas `pedidos` e `items_pedido`.
-- Posiblemente pasar de `en_stock` (sí/no) a `cantidad` (número), para descontar stock automáticamente.
+- La cantidad de stock por variante y las ventas que la descuentan ya existen (migración 02): los pedidos pagados pueden usar la misma función `registrar_venta`.
 
 ## Ideas sueltas
 
