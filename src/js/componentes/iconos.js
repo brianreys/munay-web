@@ -15,4 +15,5 @@ export const ICONOS = {
   flechaIzquierda: `<svg viewBox="0 0 24 24" ${atributos}><path d="M15 5l-7 7 7 7"/></svg>`,
   flechaAbajo: `<svg viewBox="0 0 24 24" ${atributos.replace('width="20" height="20"', 'width="14" height="14"')}><path d="M6 9l6 6 6-6"/></svg>`,
   flechaDerecha: `<svg viewBox="0 0 24 24" ${atributos}><path d="M9 5l7 7-7 7"/></svg>`,
+  lupa: `<svg viewBox="0 0 24 24" ${atributos.replace('width="20" height="20"', 'width="18" height="18"')}><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>`,
 };

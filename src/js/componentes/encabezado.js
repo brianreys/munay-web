@@ -67,6 +67,13 @@ export function renderEncabezado(elemento, catalogo) {
 
       <a href="#/" class="logo" aria-label="Munay, ir al inicio">munay.</a>
 
+      <form class="buscador" role="search" data-buscador>
+        <label class="visualmente-oculto" for="buscador-productos">Buscar productos</label>
+        <input class="buscador__campo" id="buscador-productos" type="search" name="q"
+               placeholder="Buscar productos" autocomplete="off" />
+        <button class="buscador__boton" type="submit" aria-label="Buscar">${ICONOS.lupa}</button>
+      </form>
+
       <a href="${SITIO.instagram.url}" class="encabezado__social" target="_blank" rel="noopener"
          aria-label="Instagram de Munay (se abre en otra pestaña)">${ICONOS.instagram}</a>
     </div>
@@ -89,6 +96,17 @@ export function renderEncabezado(elemento, catalogo) {
 
   conectarMenuCelular(elemento);
   conectarDesplegables(elemento);
+  conectarBuscador(elemento);
+}
+
+/** Buscador de productos (solo escritorio): lleva a #/buscar/<texto>. */
+function conectarBuscador(encabezado) {
+  const formulario = encabezado.querySelector('[data-buscador]');
+  formulario.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const texto = formulario.elements.q.value.trim();
+    if (texto) window.location.hash = `#/buscar/${encodeURIComponent(texto)}`;
+  });
 }
 
 /* -------------------------------------------------------------------------- */

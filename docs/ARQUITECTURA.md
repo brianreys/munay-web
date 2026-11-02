@@ -49,6 +49,7 @@
 | `#/producto/<slug>` | `vistas/producto.js`: detalle |
 | `#/producto/<slug>/<id-variante>` | Detalle con una variante preseleccionada |
 | `#/sobre-munay`, `#/contacto` | Inicio, desplazado a esa sección |
+| `#/buscar/<texto>` | `vistas/busqueda.js`: resultados del buscador del encabezado (escritorio) |
 
 5. Cada vista devuelve `{ titulo, seccion, limpiar }`. Antes de cambiar de página, el router ejecuta `limpiar`, que detiene el carrusel y desconecta los eventos.
 

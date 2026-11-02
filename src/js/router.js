@@ -10,6 +10,7 @@
  */
 
 import { actualizarEncabezado } from './componentes/encabezado.js';
+import { vistaBusqueda } from './vistas/busqueda.js';
 import { vistaCatalogo } from './vistas/catalogo.js';
 import { vistaInicio } from './vistas/inicio.js';
 import { vistaNoEncontrado } from './vistas/no-encontrado.js';
@@ -29,6 +30,7 @@ const RUTAS = [
   { patron: new RegExp(`^producto/${SEGMENTO}(?:/${SEGMENTO})?$`), vista: vistaProducto },
   { patron: /^sobre-munay$/, vista: vistaInicio, ancla: 'sobre-munay' },
   { patron: /^contacto$/, vista: vistaInicio, ancla: 'contacto' },
+  { patron: /^buscar\/(.+)$/, vista: vistaBusqueda },
 ];
 
 /**

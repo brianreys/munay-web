@@ -239,8 +239,92 @@
   color: var(--color-terracota);
 }
 
+/* ----- Encabezado en una fila (escritorio) -----
+   Logo a la izquierda · pestañas · buscador · Instagram. La barra del logo
+   y la navegación son bloques separados (así funciona el menú de celular),
+   por eso acá se acomodan juntos en una grilla del encabezado. */
+@media (min-width: 761px) {
+  .encabezado {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    column-gap: clamp(16px, 2.5vw, 32px);
+    padding: 12px max(var(--margen-lateral), calc((100% - var(--ancho-maximo)) / 2 + var(--margen-lateral)));
+  }
+
+  .encabezado__barra {
+    display: contents;
+  }
+
+  .logo {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .navegacion {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .navegacion__lista {
+    padding-block: 0;
+  }
+
+  .buscador {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .encabezado__social {
+    grid-column: 4;
+    grid-row: 1;
+  }
+}
+
+/* Buscador de productos */
+.buscador {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-encabezado-texto) 45%, transparent);
+  transition: border-color var(--transicion);
+}
+
+.buscador:focus-within {
+  border-color: currentColor;
+}
+
+.buscador__campo {
+  width: clamp(120px, 14vw, 200px);
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.buscador__campo::placeholder {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.buscador__boton {
+  display: grid;
+  place-items: center;
+  padding: 6px 0 6px 8px;
+  border: 0;
+  background: none;
+}
+
 /* ----- Navegación (celular) ----- */
 @media (max-width: 760px) {
+  /* En celular el encabezado queda como siempre: sin buscador */
+  .buscador {
+    display: none;
+  }
+
   .encabezado__barra {
     padding-block: 10px;
   }
